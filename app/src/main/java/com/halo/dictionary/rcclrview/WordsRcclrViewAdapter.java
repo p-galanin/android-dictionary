@@ -2,16 +2,19 @@ package com.halo.dictionary.rcclrview;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.halo.dictionary.R;
 import com.halo.dictionary.sql.WordContract;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Адаптер для отображения переданных слов
@@ -24,6 +27,8 @@ public class WordsRcclrViewAdapter
 
     private Cursor mCursor;
     private Context mContext;
+
+    private final Set<Long> hiddenTrnslIds = new HashSet<>();
 
     private static WordsRcclrViewAdapter INSTANCE;
 
@@ -60,6 +65,8 @@ public class WordsRcclrViewAdapter
         holder.mTvWord.setText(word);
         holder.mTvTranslation.setText((translation == null) ? "" : translation);
         holder.mTvId.setText(id.toString());
+
+        holder.mTvTranslation.setVisibility(WordViewHolder.hiddenIds.contains(id.toString())? View.INVISIBLE : View.VISIBLE);
     }
 
     @Override
@@ -103,11 +110,27 @@ public class WordsRcclrViewAdapter
         public TextView mTvWord;
         public TextView mTvTranslation;
 
+        public static final Set<String> hiddenIds = new HashSet<>();
+
         public WordViewHolder(View view) {
             super(view);
-            this.mTvId = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_id);
-            this.mTvWord = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_word);
-            this.mTvTranslation = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_translation);
+            this.mTvId = view.findViewById(R.id.tv_c_rcclr_view_words_id);
+            this.mTvWord = view.findViewById(R.id.tv_c_rcclr_view_words_word);
+            this.mTvTranslation = view.findViewById(R.id.tv_c_rcclr_view_words_translation);
+
+            view.setOnClickListener(tvView -> {
+                final String id = mTvId.getText().toString();
+                if (!id.isEmpty()) {
+                    if (hiddenIds.contains(id)) {
+                        hiddenIds.remove(id);
+                        mTvTranslation.setVisibility(View.VISIBLE);
+                    } else {
+                        hiddenIds.add(id);
+                        mTvTranslation.setVisibility(View.INVISIBLE);
+                    }
+                }
+            }
+            );
         }
     }
 

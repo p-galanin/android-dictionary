@@ -5,12 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.halo.dictionary.WordEntry;
-import com.halo.dictionary.sql.WordContract;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Класс для управления обменом данными с БД
@@ -130,6 +130,7 @@ public class WordDbHelper extends SQLiteOpenHelper {
      * @param id - идентификатор удаляемой записи
      */
     public void removeWordEntry(long id) {
+        Log.d("Remove " + id, "");
         this.getWritableDatabase().delete(
                 WordContract.WordEntry.TABLE_NAME, WordContract.WordEntry._ID + "='" + id + "'", null);
     }
@@ -201,9 +202,13 @@ public class WordDbHelper extends SQLiteOpenHelper {
      */
     private long createWordEntry(
             @NonNull final String word, final String translation, @NonNull SQLiteDatabase dbWordsWr) {
+
         ContentValues values = new ContentValues();
         values.put(WordContract.WordEntry.COLUMN_NAME_WORD, word);
         values.put(WordContract.WordEntry.COLUMN_NAME_TRANSLATION, translation);
+
+        Log.d("Adding new word: " + word + " (" + translation + ")", "");
+
         return dbWordsWr.insert(WordContract.WordEntry.TABLE_NAME, null, values);
     }
 

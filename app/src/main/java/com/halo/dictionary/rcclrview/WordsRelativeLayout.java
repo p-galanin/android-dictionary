@@ -1,20 +1,16 @@
 package com.halo.dictionary.rcclrview;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.halo.dictionary.R;
+
+import androidx.core.view.GestureDetectorCompat;
 
 /**
  * Created by halo on 26.01.2018.
@@ -50,8 +46,6 @@ public class WordsRelativeLayout extends RelativeLayout {
                 final TextView mTvWord = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_word);
                 final TextView mTvTranslation = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_translation);
 
-                mTvTranslation.setVisibility(
-                        mTvTranslation.getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE);
 
                 Log.d("", mTvId == null ? "" : mTvId.toString());
             }
