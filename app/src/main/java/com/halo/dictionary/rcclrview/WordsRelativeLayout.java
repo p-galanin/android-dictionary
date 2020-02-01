@@ -18,38 +18,24 @@ import androidx.core.view.GestureDetectorCompat;
 
 public class WordsRelativeLayout extends RelativeLayout {
 
-    private GestureDetectorCompat mDetector;
-    private LayoutInflater mInflater;
-
-    /*public TextView mTvId;
-    public TextView mTvWord;
-    public TextView mTvTranslation;*/
-
     public WordsRelativeLayout(final Context context) {
         super(context);
-        this.init(context);
     }
 
-    public WordsRelativeLayout(final Context context, final AttributeSet attributeSet) {
-        super(context, attributeSet);
-        this.init(context);
-    }
+//    public WordsRelativeLayout(final Context context, final AttributeSet attributeSet) {
+//        super(context, attributeSet);
+//    }
 
     private void init(final Context context) {
         //this.mDetector = new GestureDetectorCompat(context, new WordsGestureListener());
 
-        this.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                final TextView mTvId = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_id);
-                final TextView mTvWord = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_word);
-                final TextView mTvTranslation = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_translation);
+        this.setOnClickListener(view -> {
+            final TextView mTvId = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_id);
+            final TextView mTvWord = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_word);
+            final TextView mTvTranslation = (TextView) view.findViewById(R.id.tv_c_rcclr_view_words_translation);
 
 
-                Log.d("", mTvId == null ? "" : mTvId.toString());
-            }
-
+            Log.d("", mTvId == null ? "" : mTvId.toString());
         });
     }
 

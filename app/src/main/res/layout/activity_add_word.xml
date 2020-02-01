@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="com.halo.dictionary.AddWordActivity">
+    tools:context="com.halo.dictionary.AddEntryActivity">
 
     <EditText
         android:id="@+id/tvWord"
@@ -29,15 +28,14 @@
         android:maxLines="1" />
 
     <Button
-        android:id="@+id/buttonAddWordEntry"
+        android:id="@+id/buttonSaveEntry"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/tvTranslation"
-        android:text="+"
+        android:text="@string/button_save_entry_title"
         android:textColor="@drawable/button_add"
-        android:textSize="28sp"
-        android:onClick="addWordEntry"/>
+        android:textSize="28sp"/>
 
 </RelativeLayout>

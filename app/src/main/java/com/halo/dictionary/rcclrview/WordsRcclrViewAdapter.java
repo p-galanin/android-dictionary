@@ -1,14 +1,14 @@
 package com.halo.dictionary.rcclrview;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.halo.dictionary.R;
-import com.halo.dictionary.sql.WordContract;
+import com.halo.dictionary.WordEntry;
+import com.halo.dictionary.temp.WordsListPresenter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,114 +23,64 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 
 public class WordsRcclrViewAdapter
-        extends RecyclerView.Adapter<WordsRcclrViewAdapter.WordViewHolder> {
+        extends RecyclerView.Adapter<WordsRcclrViewAdapter.EntryViewHolder> {
 
-    private Cursor mCursor;
-    private Context mContext;
-
-    private final Set<Long> hiddenTrnslIds = new HashSet<>();
-
-    private static WordsRcclrViewAdapter INSTANCE;
+    private WordsListPresenter presenter;
 
     /**
      * Создание адаптера для отображения переданных слов
      *
-     * @param cursor    - курсов базы данных для отображения данных
-     * @param context   - вызывающий контекст
+     * @param     - курсов базы данных для отображения данных
+     * @param    - вызывающий контекст
      */
-    public WordsRcclrViewAdapter(@NonNull Cursor cursor, @NonNull Context context) {
-        this.mCursor = cursor;
-        this.mContext = context;
-        INSTANCE = this;
+    public WordsRcclrViewAdapter(@NonNull WordsListPresenter presenter) {
+        this.presenter = presenter;
     }
 
+    @NonNull
     @Override
-    public WordViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public EntryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View wordView = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.custom_rcclr_view_words, parent, false);
-        return new WordViewHolder(wordView);
+        return new EntryViewHolder(wordView, this.presenter);
     }
 
     @Override
-    public void onBindViewHolder(WordViewHolder holder, int position) {
-        // Перематываем список к элементу, который должен быть отображён
-        if (!mCursor.moveToPosition(position)) {
-            return;
-        }
-
-        // Обновление ViewHolder для отображения элемента
-        final String word = mCursor.getString(mCursor.getColumnIndex(WordContract.WordEntry.COLUMN_NAME_WORD));
-        final String translation = mCursor.getString(mCursor.getColumnIndex(WordContract.WordEntry.COLUMN_NAME_TRANSLATION));
-        Long id = mCursor.getLong(mCursor.getColumnIndex(WordContract.WordEntry._ID));
-        holder.mTvWord.setText(word);
-        holder.mTvTranslation.setText((translation == null) ? "" : translation);
-        holder.mTvId.setText(id.toString());
-
-        holder.mTvTranslation.setVisibility(WordViewHolder.hiddenIds.contains(id.toString())? View.INVISIBLE : View.VISIBLE);
+    public void onBindViewHolder(EntryViewHolder holder, int position) {
+        final WordEntry wordEntry = this.presenter.getEntryForPosition(position);
+        holder.tvWord.setText(wordEntry.getWord());
+        holder.tvTranslation.setText(wordEntry.getTranslation());
+        holder.tvId.setText(String.valueOf(wordEntry.getId()));
+        holder.tvTranslation.setVisibility(this.presenter.isTranslationVisible(wordEntry.getId()) ? View.INVISIBLE : View.VISIBLE);
     }
 
     @Override
     public int getItemCount() {
-        return mCursor.getCount();
-    }
-
-    /**
-     * Swaps the Cursor currently held in the adapter with a new one
-     * and triggers a UI refresh
-     *
-     * @param newCursor the new cursor that will replace the existing one
-     */
-    public void swapCursor(Cursor newCursor) {
-        if (mCursor != null) {
-            mCursor.close();
-        }
-
-        mCursor = newCursor;
-
-        if (newCursor != null) {
-            this.notifyDataSetChanged();
-        }
-    }
-
-    /**
-     * Возвращает экземпляр {@link WordsRcclrViewAdapter}
-     *
-     * @return экземпляр {@link WordsRcclrViewAdapter} или {@code null}, если он не создан
-     */
-    public static WordsRcclrViewAdapter getInstance() {
-        return INSTANCE;
+        return this.presenter.getEntriesAmount();
     }
 
     /**
      * View for each separate data item
      */
-    public static class WordViewHolder extends RecyclerView.ViewHolder {
+    static class EntryViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mTvId;
-        public TextView mTvWord;
-        public TextView mTvTranslation;
+        TextView tvId;
+        TextView tvWord;
+        TextView tvTranslation;
+        WordsListPresenter presenter;
 
-        public static final Set<String> hiddenIds = new HashSet<>();
-
-        public WordViewHolder(View view) {
+        EntryViewHolder(View view, WordsListPresenter presenter) {
             super(view);
-            this.mTvId = view.findViewById(R.id.tv_c_rcclr_view_words_id);
-            this.mTvWord = view.findViewById(R.id.tv_c_rcclr_view_words_word);
-            this.mTvTranslation = view.findViewById(R.id.tv_c_rcclr_view_words_translation);
+            this.tvId = view.findViewById(R.id.tv_c_rcclr_view_words_id);
+            this.tvWord = view.findViewById(R.id.tv_c_rcclr_view_words_word);
+            this.tvTranslation = view.findViewById(R.id.tv_c_rcclr_view_words_translation);
+            this.presenter = presenter;
 
             view.setOnClickListener(tvView -> {
-                final String id = mTvId.getText().toString();
-                if (!id.isEmpty()) {
-                    if (hiddenIds.contains(id)) {
-                        hiddenIds.remove(id);
-                        mTvTranslation.setVisibility(View.VISIBLE);
-                    } else {
-                        hiddenIds.add(id);
-                        mTvTranslation.setVisibility(View.INVISIBLE);
-                    }
-                }
-            }
-            );
+                final Long id = Long.parseLong(tvId.getText().toString());
+                this.presenter.onClickEntry(id);
+                this.tvId.setVisibility(this.presenter.isTranslationVisible(id) ? View.VISIBLE : View.INVISIBLE);
+            });
         }
     }
 

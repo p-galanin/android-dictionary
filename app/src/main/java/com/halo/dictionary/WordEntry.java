@@ -16,7 +16,7 @@ public class WordEntry {
 
     public WordEntry(@NonNull final String word, final String translation, long id) {
         this.word = word;
-        this.translation = translation;
+        this.translation = translation == null ? "" : translation;
         this.id = id;
     }
 
@@ -27,5 +27,15 @@ public class WordEntry {
      */
     public long getId() {
         return this.id;
+    }
+
+    @NonNull
+    public String getWord() {
+        return this.word;
+    }
+
+    @NonNull
+    public String getTranslation() {
+        return this.translation;
     }
 }
