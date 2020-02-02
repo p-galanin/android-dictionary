@@ -1,4 +1,4 @@
-package com.halo.dictionary.sql;
+package com.halo.dictionary.repository.sql;
 
 import android.provider.BaseColumns;
 

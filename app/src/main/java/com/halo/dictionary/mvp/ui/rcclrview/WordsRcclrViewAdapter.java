@@ -1,17 +1,12 @@
-package com.halo.dictionary.rcclrview;
+package com.halo.dictionary.mvp.ui.rcclrview;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.halo.dictionary.R;
-import com.halo.dictionary.WordEntry;
-import com.halo.dictionary.temp.WordsListPresenter;
-
-import java.util.HashSet;
-import java.util.Set;
+import com.halo.dictionary.mvp.WordsListPresenter;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,12 +41,14 @@ public class WordsRcclrViewAdapter
     }
 
     @Override
-    public void onBindViewHolder(EntryViewHolder holder, int position) {
-        final WordEntry wordEntry = this.presenter.getEntryForPosition(position);
-        holder.tvWord.setText(wordEntry.getWord());
-        holder.tvTranslation.setText(wordEntry.getTranslation());
-        holder.tvId.setText(String.valueOf(wordEntry.getId()));
-        holder.tvTranslation.setVisibility(this.presenter.isTranslationVisible(wordEntry.getId()) ? View.INVISIBLE : View.VISIBLE);
+    public void onBindViewHolder(@NonNull EntryViewHolder holder, int position) {
+        this.presenter.getEntryForPosition(position).ifPresent(wordEntry ->
+        {
+            holder.tvWord.setText(wordEntry.getWord());
+            holder.tvTranslation.setText(wordEntry.getTranslation());
+            holder.tvId.setText(String.valueOf(wordEntry.getId()));
+            holder.tvTranslation.setVisibility(this.presenter.isTranslationVisible(wordEntry.getId()) ? View.VISIBLE : View.INVISIBLE);
+        });
     }
 
     @Override
@@ -79,7 +76,7 @@ public class WordsRcclrViewAdapter
             view.setOnClickListener(tvView -> {
                 final Long id = Long.parseLong(tvId.getText().toString());
                 this.presenter.onClickEntry(id);
-                this.tvId.setVisibility(this.presenter.isTranslationVisible(id) ? View.VISIBLE : View.INVISIBLE);
+                this.tvTranslation.setVisibility(this.presenter.isTranslationVisible(id) ? View.VISIBLE : View.INVISIBLE);
             });
         }
     }

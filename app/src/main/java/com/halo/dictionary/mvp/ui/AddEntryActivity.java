@@ -1,14 +1,17 @@
-package com.halo.dictionary;
+package com.halo.dictionary.mvp.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.halo.dictionary.temp.AddEntryPresenter;
-import com.halo.dictionary.temp.AddEntryPresenterImpl;
-import com.halo.dictionary.temp.AddEntryView;
+import com.halo.dictionary.R;
+import com.halo.dictionary.mvp.AddEntryPresenter;
+import com.halo.dictionary.mvp.impl.AddEntryPresenterImpl;
+import com.halo.dictionary.mvp.AddEntryView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class AddEntryActivity extends AppCompatActivity implements AddEntryView {
@@ -25,8 +28,7 @@ public class AddEntryActivity extends AppCompatActivity implements AddEntryView 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_word);
 
-        this.presenter = new AddEntryPresenterImpl();
-        this.presenter.attachView(this);
+        this.presenter = new AddEntryPresenterImpl(this);
 
         this.tvWord = findViewById(R.id.tvWord);
         this.tvTranslation = findViewById(R.id.tvTranslation);
@@ -55,15 +57,28 @@ public class AddEntryActivity extends AppCompatActivity implements AddEntryView 
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
-
     @Override
-    public void start() {
-
+    public Context getContext() {
+        return getApplicationContext();
     }
 
     @Override
     public void close() {
-
+        finish();
     }
 
+    @Override
+    public void showProgress() {
+        // TODO
+    }
+
+    @Override
+    public void stopProgress() {
+        // TODO
+    }
+
+    @Override
+    public void executeOnUiThread(@NonNull final Runnable task) {
+        runOnUiThread(task);
+    }
 }

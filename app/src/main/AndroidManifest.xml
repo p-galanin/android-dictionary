@@ -3,8 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.halo.dictionary">
 
+    <!--
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
 
     <application
         android:allowBackup="true"
@@ -12,20 +15,20 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         <service
             android:name=".DumpFileWordsService"
             android:exported="false"></service>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".mvp.ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".AddEntryActivity" />
+        <activity android:name=".mvp.ui.AddEntryActivity" />
 
     </application>
 

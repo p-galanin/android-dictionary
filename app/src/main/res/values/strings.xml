@@ -3,4 +3,6 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="button_save_entry_title">+</string>
+    <string name="item_dump_to_file">Dump to file</string>
+    <string name="item_restore_from_file">Restore from file</string>
 </resources>

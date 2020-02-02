@@ -1,4 +1,4 @@
-package com.halo.dictionary;
+package com.halo.dictionary.mvp;
 
 import androidx.annotation.NonNull;
 
@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 
 public class WordEntry {
 
-    private long id;
+    private final long id;
     private final String word;
     private final String translation;
 

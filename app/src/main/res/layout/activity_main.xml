@@ -4,57 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.halo.dictionary.MainActivity">
+    tools:context="com.halo.dictionary.mvp.ui.MainActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimaryDark"
+        app:titleTextColor="@color/design_default_color_background"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_words"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerVertical="true"
+        android:layout_below="@+id/main_toolbar"
         android:scrollbars="vertical"
-        android:visibility="visible"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp" />
-
-<!--    <Button-->
-<!--        android:id="@+id/button_add"-->
-<!--        android:layout_width="48dp"-->
-<!--        android:layout_height="48dp"-->
-<!--        android:layout_alignParentBottom="true"-->
-<!--        android:layout_alignParentEnd="true"-->
-<!--        android:layout_marginBottom="16dp"-->
-<!--        android:layout_marginEnd="16dp"-->
-<!--        android:background="@drawable/button_add"-->
-<!--        android:elevation="24dp"-->
-<!--        android:text="+"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textColor="@android:color/background_light"-->
-<!--        android:textSize="16dp" />-->
-
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_dump_to_file_through_service"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button_dump_to_file"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:backgroundTint="@color/design_default_color_secondary"
-        android:src="@drawable/ic_fab_add_entry" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_dump_to_file"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button_add"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:src="@drawable/ic_fab_add_entry"
-        android:backgroundTint="@color/design_default_color_primary"/>
+        android:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_add"
@@ -66,6 +33,14 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"/>
 
+    <!-- TODO change -->
+    <ProgressBar
+        android:id="@+id/progress_circular"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"/>
 
 
 </RelativeLayout>

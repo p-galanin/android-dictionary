@@ -1,4 +1,4 @@
-package com.halo.dictionary.temp;
+package com.halo.dictionary.mvp;
 
 public interface PresenterBase<T> {
 
@@ -7,7 +7,5 @@ public interface PresenterBase<T> {
     void detachView();
 
     T getView();
-
-    DictionaryRepository getRepository();
 
 }

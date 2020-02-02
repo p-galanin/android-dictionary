@@ -1,4 +1,4 @@
-package com.halo.dictionary.temp;
+package com.halo.dictionary.mvp;
 
 public interface AddEntryPresenter extends PresenterBase<AddEntryView> {
 

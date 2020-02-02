@@ -1,4 +1,4 @@
-package com.halo.dictionary.sql;
+package com.halo.dictionary.repository.sql;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.halo.dictionary.WordEntry;
+import com.halo.dictionary.mvp.WordEntry;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +20,8 @@ import androidx.annotation.Nullable;
 
 public class WordDbHelper extends SQLiteOpenHelper {
 
-    public static final String DATABASE_NAME = "words.db";
+    private static final String DATABASE_NAME = "words.db";
+    private static final String TAG = WordDbHelper.class.getSimpleName();
 
     private Long latestWordIndex;
 
@@ -51,9 +52,38 @@ public class WordDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + WordContract.WordEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + WordContract.WordEntry.TABLE_NAME); // TODO easy, boy
         onCreate(sqLiteDatabase);
     }
+
+    /**
+     * Получить экземпляр {@link WordDbHelper}
+     *
+     * @return {@link WordDbHelper} или {@code null}, если экземпляр ещё не создан
+     */
+    @Nullable
+    public static synchronized WordDbHelper getInstance() {
+        return INSTANCE;
+    }
+
+    /**
+     * Получить экземпляр {@link WordDbHelper} или создать новый, если экземпляр ещё не создан
+     *
+     * @param context - контекст, с которым будет создан экземпляр, если до этого ещё не создан
+     *
+     * @return {@link WordDbHelper}
+     */
+    @NonNull
+    public static synchronized WordDbHelper getInstance(@NonNull Context context) {
+        if (INSTANCE == null) {
+            INSTANCE = new WordDbHelper(context);
+        }
+        return INSTANCE;
+    }
+
+
+
+    // ------------------------------------------------
 
     /**
      * Возвращает все хранящиеся в базе записи о словах.
@@ -130,7 +160,7 @@ public class WordDbHelper extends SQLiteOpenHelper {
      * @param id - идентификатор удаляемой записи
      */
     public void removeWordEntry(long id) {
-        Log.d("Remove " + id, "");
+        Log.d(TAG, "Remove " + id);
         this.getWritableDatabase().delete(
                 WordContract.WordEntry.TABLE_NAME, WordContract.WordEntry._ID + "='" + id + "'", null);
     }
@@ -145,30 +175,6 @@ public class WordDbHelper extends SQLiteOpenHelper {
         return this.latestWordIndex;
     }
 
-    /**
-     * Получить экземпляр {@link WordDbHelper}
-     *
-     * @return {@link WordDbHelper} или {@code null}, если экземпляр ещё не создан
-     */
-    @Nullable
-    public static synchronized WordDbHelper getInstance() {
-        return INSTANCE;
-    }
-
-    /**
-     * Получить экземпляр {@link WordDbHelper} или создать новый, если экземпляр ещё не создан
-     *
-     * @param context - контекст, с которым будет создан экземпляр, если до этого ещё не создан
-     *
-     * @return {@link WordDbHelper}
-     */
-    @NonNull
-    public static synchronized WordDbHelper getInstance(@NonNull Context context) {
-        if (INSTANCE == null) {
-            INSTANCE = new WordDbHelper(context);
-        }
-        return INSTANCE;
-    }
 
     /**
      * Возвращает индекс записи в отсортированной таблице по индексу в таблице из хранилища
@@ -207,7 +213,7 @@ public class WordDbHelper extends SQLiteOpenHelper {
         values.put(WordContract.WordEntry.COLUMN_NAME_WORD, word);
         values.put(WordContract.WordEntry.COLUMN_NAME_TRANSLATION, translation);
 
-        Log.d("Adding new word: " + word + " (" + translation + ")", "");
+        Log.d(TAG, "Adding new word: " + word + " (" + translation + ")");
 
         return dbWordsWr.insert(WordContract.WordEntry.TABLE_NAME, null, values);
     }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_dump"
+        android:title="@string/item_dump_to_file">
+    </item>
+    <item
+        android:id="@+id/item_restore"
+        android:title="@string/item_restore_from_file">
+    </item>
+
+</menu>

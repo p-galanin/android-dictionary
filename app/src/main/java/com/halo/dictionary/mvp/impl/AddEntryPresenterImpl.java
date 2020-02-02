@@ -1,8 +1,26 @@
-package com.halo.dictionary.temp;
+package com.halo.dictionary.mvp.impl;
+
+import com.halo.dictionary.mvp.AddEntryPresenter;
+import com.halo.dictionary.mvp.AddEntryView;
+import com.halo.dictionary.repository.DictionaryRepository;
+import com.halo.dictionary.repository.DictionaryRepositoryFactory;
+
+import androidx.annotation.NonNull;
 
 public class AddEntryPresenterImpl implements AddEntryPresenter {
 
     private AddEntryView view;
+    private DictionaryRepository repository;
+
+    public AddEntryPresenterImpl(@NonNull final AddEntryView view) {
+        attachView(view);
+        this.repository = DictionaryRepositoryFactory.createDictionaryRepository(getView());
+    }
+
+    AddEntryPresenterImpl(@NonNull final AddEntryView view, @NonNull DictionaryRepository repository) {
+        attachView(view);
+        this.repository = repository;
+    }
 
     @Override
     public void onSaveButtonClicked() {
@@ -10,7 +28,7 @@ public class AddEntryPresenterImpl implements AddEntryPresenter {
         final String translation = getView().getEnteredTranslation();
 
         if (validateInput(word, translation)) {
-            getRepository().createWord(word, translation);
+            this.repository.createEntry(word, translation, true);
             getView().showMessage("Word added");
             getView().close();
         }
@@ -32,7 +50,7 @@ public class AddEntryPresenterImpl implements AddEntryPresenter {
         if (word == null || word.isEmpty()) {
             getView().showMessage("Enter word value");
             isCorrect = false;
-        } else if (translation == null || translation.isEmpty()) {
+        } else if (translation == null) {
             getView().showMessage("Enter translation value");
             isCorrect = false;
         } else {
@@ -49,8 +67,4 @@ public class AddEntryPresenterImpl implements AddEntryPresenter {
         return this.view;
     }
 
-    @Override
-    public DictionaryRepository getRepository() {
-        return null;
-    }
 }
