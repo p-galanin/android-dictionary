@@ -35,7 +35,7 @@ public class AddEntryPresenterImpl implements AddEntryPresenter {
     }
 
     @Override
-    public void attachView(final AddEntryView view) {
+    public void attachView(@NonNull final AddEntryView view) {
         this.view = view;
     }
 

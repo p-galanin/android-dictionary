@@ -23,18 +23,27 @@ public class WordDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "words.db";
     private static final String TAG = WordDbHelper.class.getSimpleName();
 
-    private Long latestWordIndex;
-
     private static WordDbHelper INSTANCE;
 
     private static final int DATABASE_VERSION = 1;
 
-    /**
-     * Создаёт экземпляр
-     * @param context
-     */
     private WordDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+
+    /**
+     * Получить экземпляр {@link WordDbHelper} или создать новый, если экземпляр ещё не создан.
+     *
+     * @param context - контекст, с которым будет создан экземпляр, если до этого ещё не создан
+     * @return {@link WordDbHelper}
+     */
+    @NonNull
+    public static synchronized WordDbHelper getInstance(@NonNull Context context) {
+        if (INSTANCE == null) {
+            INSTANCE = new WordDbHelper(context);
+        }
+        return INSTANCE;
     }
 
     @Override
@@ -42,10 +51,10 @@ public class WordDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_WORDS_TABLE =
                 "CREATE TABLE " + WordContract.WordEntry.TABLE_NAME + " (" +
-                 WordContract.WordEntry._ID                      + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                 WordContract.WordEntry.COLUMN_NAME_WORD         + " VARCHAR(63) NOT NULL, " +
-                 WordContract.WordEntry.COLUMN_NAME_TRANSLATION  + " VARCHAR(511)" +
-                 ");";
+                        WordContract.WordEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        WordContract.WordEntry.COLUMN_NAME_WORD + " VARCHAR(63) NOT NULL, " +
+                        WordContract.WordEntry.COLUMN_NAME_TRANSLATION + " VARCHAR(511)" +
+                        ");";
 
         sqLiteDatabase.execSQL(SQL_CREATE_WORDS_TABLE);
     }
@@ -65,25 +74,6 @@ public class WordDbHelper extends SQLiteOpenHelper {
     public static synchronized WordDbHelper getInstance() {
         return INSTANCE;
     }
-
-    /**
-     * Получить экземпляр {@link WordDbHelper} или создать новый, если экземпляр ещё не создан
-     *
-     * @param context - контекст, с которым будет создан экземпляр, если до этого ещё не создан
-     *
-     * @return {@link WordDbHelper}
-     */
-    @NonNull
-    public static synchronized WordDbHelper getInstance(@NonNull Context context) {
-        if (INSTANCE == null) {
-            INSTANCE = new WordDbHelper(context);
-        }
-        return INSTANCE;
-    }
-
-
-
-    // ------------------------------------------------
 
     /**
      * Возвращает все хранящиеся в базе записи о словах.
@@ -117,23 +107,6 @@ public class WordDbHelper extends SQLiteOpenHelper {
         );
     }
 
-    /**
-     * Добавляет в БД запись о слове, а также фиксирует его индекс,
-     * который можно получить в {@link #getLatestWordIndex()}
-     *
-     * @param word - слово
-     * @param translation - перевод
-     *
-     * @return созданный объект записи о слове или {@code null}, если запись не была создана
-     */
-    @Nullable
-    public WordEntry createWordEntryAndSetLatestIndex(@NonNull final String word, @Nullable final String translation) {
-        final WordEntry newWordEntry = this.createWordEntry(word, translation);
-        if (newWordEntry != null) {
-            this.setLatestWordIndex(this.getOrderedIndex(newWordEntry.getId()));
-        }
-        return newWordEntry;
-    }
 
     /**
      * Создаёт в БД запись о слове
@@ -166,44 +139,11 @@ public class WordDbHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Возвраащает индекс последней добавленной записи о слове
-     *
-     * @return индекс последней добавленной записи о слове или {@code null}, если индекс сброшен
-     */
-    @Nullable
-    public Long getLatestWordIndex() {
-        return this.latestWordIndex;
-    }
-
-
-    /**
-     * Возвращает индекс записи в отсортированной таблице по индексу в таблице из хранилища
-     *
-     * @param id - идентификатор записи в БД
-     *
-     * @return индекс записи слова в отсортированной таблице или -1, если слово не найдено
-     */
-    private long getOrderedIndex(long id) {
-        long result = 0;
-
-        Cursor cursor = this.getAllWordsEntries();
-        while (cursor.moveToNext()) {
-            if (id == cursor.getLong(cursor.getColumnIndex(WordContract.WordEntry._ID))) {
-                return result;
-            }
-            result++;
-        }
-
-        return -1;
-    }
-
-    /**
      * Добавление записи о слове в переданную базу.
      *
-     * @param word - слово
+     * @param word        - слово
      * @param translation - перевод слова
-     * @param dbWordsWr - база данных для внесения записи
-     *
+     * @param dbWordsWr   - база данных для внесения записи
      * @return ID добавленной записи в таблице или -1, если запись не была добавлена
      */
     private long createWordEntry(
@@ -216,15 +156,6 @@ public class WordDbHelper extends SQLiteOpenHelper {
         Log.d(TAG, "Adding new word: " + word + " (" + translation + ")");
 
         return dbWordsWr.insert(WordContract.WordEntry.TABLE_NAME, null, values);
-    }
-
-    /**
-     * Устанавливает индекс последнего добавленной записи о слове
-     *
-     * @param newIndex - новый индекс последнего добавленного слова
-     */
-    private synchronized void setLatestWordIndex(Long newIndex) {
-        this.latestWordIndex = newIndex;
     }
 
 }

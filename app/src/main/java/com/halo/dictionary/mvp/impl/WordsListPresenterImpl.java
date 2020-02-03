@@ -3,10 +3,11 @@ package com.halo.dictionary.mvp.impl;
 import android.content.Context;
 import android.net.Uri;
 
-import com.halo.dictionary.mvp.Utils;
+import com.halo.dictionary.mvp.base.Utils;
 import com.halo.dictionary.mvp.WordEntry;
 import com.halo.dictionary.mvp.WordsListPresenter;
 import com.halo.dictionary.mvp.WordsListView;
+import com.halo.dictionary.periodic.PeriodicWorkUtils;
 import com.halo.dictionary.repository.DictionaryRepository;
 import com.halo.dictionary.repository.DictionaryRepositoryFactory;
 import com.halo.dictionary.repository.dump.DumpCallback;
@@ -42,6 +43,11 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
+    public void onViewInitialized() {
+        PeriodicWorkUtils.startWordOfTheDayNotifications(getView());
+    }
+
+    @Override
     public void onAddWordButtonClicked() {
         getView().goToAddWordScreen();
     }
@@ -52,10 +58,8 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
-    public void onWordSwiped(String wordId) {
-        if (wordId != null && !wordId.isEmpty()) {
-            this.repository.deleteEntry(Long.parseLong(wordId));
-        }
+    public void onWordSwiped(@NonNull Long wordId) {
+        this.repository.deleteEntry(wordId);
     }
 
     @Override
@@ -108,20 +112,18 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     public void onDumpDirectoryPicked(final Uri uri) {
         final Optional<String> directoryPath = Utils.getDirectoryPathFromUri(uri);
         if (directoryPath.isPresent()) {
-            new Thread(() -> {
-                this.repository.dump(directoryPath.get(), new DumpCallback() {
+            new Thread(() -> this.repository.dump(directoryPath.get(), new DumpCallback() {
 
-                    @Override
-                    public void onComplete() {
-                        getView().executeOnUiThread(() -> getView().showMessage("Dump successful"));
-                    }
+                @Override
+                public void onComplete() {
+                    getView().executeOnUiThread(() -> getView().showMessage("Dump successful"));
+                }
 
-                    @Override
-                    public void onError(final String errorText) {
-                        getView().executeOnUiThread(() -> getView().showMessage(errorText));
-                    }
-                });
-            }).start();
+                @Override
+                public void onError(final String errorText) {
+                    getView().executeOnUiThread(() -> getView().showMessage(errorText));
+                }
+            })).start();
         } else {
             getView().showMessage("Choose another directory");
         }
@@ -138,7 +140,7 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
-    public void attachView(final WordsListView view) {
+    public void attachView(@NonNull final WordsListView view) {
         this.view = view;
     }
 
@@ -155,7 +157,7 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
-    public void onWordsListChanged() {
+    public void onEntriesListChanged() {
         getView().executeOnUiThread(() -> getEntriesNavigator().refresh());
         getView().executeOnUiThread(() -> getView().refreshList());
     }

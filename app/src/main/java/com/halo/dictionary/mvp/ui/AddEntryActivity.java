@@ -8,8 +8,8 @@ import android.widget.Toast;
 
 import com.halo.dictionary.R;
 import com.halo.dictionary.mvp.AddEntryPresenter;
-import com.halo.dictionary.mvp.impl.AddEntryPresenterImpl;
 import com.halo.dictionary.mvp.AddEntryView;
+import com.halo.dictionary.mvp.impl.AddEntryPresenterImpl;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,11 +38,6 @@ public class AddEntryActivity extends AppCompatActivity implements AddEntryView 
     }
 
     @Override
-    public void focusWordEditView() {
-        // TODO ннада?
-    }
-
-    @Override
     public String getEnteredWord() {
         return this.tvWord.getText().toString();
     }
@@ -53,10 +48,11 @@ public class AddEntryActivity extends AppCompatActivity implements AddEntryView 
     }
 
     @Override
-    public void showMessage(final String text) {
+    public void showMessage(@NonNull final String text) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
+    @NonNull
     @Override
     public Context getContext() {
         return getApplicationContext();

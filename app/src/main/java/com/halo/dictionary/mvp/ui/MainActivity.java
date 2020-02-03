@@ -24,11 +24,11 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.halo.dictionary.R;
-import com.halo.dictionary.mvp.Utils;
-import com.halo.dictionary.mvp.ui.rcclrview.WordsRcclrViewAdapter;
 import com.halo.dictionary.mvp.WordsListPresenter;
-import com.halo.dictionary.mvp.impl.WordsListPresenterImpl;
 import com.halo.dictionary.mvp.WordsListView;
+import com.halo.dictionary.mvp.base.Utils;
+import com.halo.dictionary.mvp.impl.WordsListPresenterImpl;
+import com.halo.dictionary.mvp.ui.rcclrview.WordsRcclrViewAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
     private ProgressBar progressBar;
 
     private static final String TAG = "MainActivity";
+
     private static final int CHOOSE_FILE_CODE = 1;
     private static final int CHOOSE_DIRECTORY_CODE = 2;
     private static final int REQUEST_PERMISSION_CODE = 10;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
         setContentView(R.layout.activity_main);
         this.presenter = new WordsListPresenterImpl(this);
         init();
+        this.presenter.onViewInitialized();
     }
 
     @Override
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 View view = viewHolder.itemView;
                 String idString = ((TextView) view.findViewById(R.id.tv_c_rcclr_view_words_id)).getText().toString();
-                MainActivity.this.presenter.onWordSwiped(idString);
+                MainActivity.this.presenter.onWordSwiped(Long.parseLong(idString));
             }
 
         }).attachToRecyclerView(mRcclrViewWords);
@@ -95,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
         mFabAddWord.setOnClickListener(button -> MainActivity.this.presenter.onAddWordButtonClicked());
 
         this.progressBar = findViewById(R.id.progress_circular);
-
     }
 
     @Override
@@ -131,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
         this.rcclrViewAdapter.notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
     public Context getContext() {
         return getApplicationContext();
@@ -152,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
     }
 
     @Override
-    public void showMessage(final String text) {
+    public void showMessage(@NonNull final String text) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
@@ -199,4 +201,5 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
         }
         return true;
     }
+
 }

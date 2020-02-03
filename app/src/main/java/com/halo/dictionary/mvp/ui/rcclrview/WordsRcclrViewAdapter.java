@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
- * Адаптер для отображения переданных слов
+ * Адаптер для отображения переданных слов.
  *
  * Created by halo on 08.09.2017.
  */
@@ -23,10 +23,9 @@ public class WordsRcclrViewAdapter
     private WordsListPresenter presenter;
 
     /**
-     * Создание адаптера для отображения переданных слов
+     * Создание адаптера для отображения переданных слов.
      *
-     * @param     - курсов базы данных для отображения данных
-     * @param    - вызывающий контекст
+     * @param presenter презентер для получения некоторой информации по отображению
      */
     public WordsRcclrViewAdapter(@NonNull WordsListPresenter presenter) {
         this.presenter = presenter;
@@ -57,7 +56,7 @@ public class WordsRcclrViewAdapter
     }
 
     /**
-     * View for each separate data item
+     * View for each separate data item.
      */
     static class EntryViewHolder extends RecyclerView.ViewHolder {
 

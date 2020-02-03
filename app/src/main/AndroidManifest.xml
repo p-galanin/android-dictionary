@@ -3,11 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.halo.dictionary">
 
-    <!--
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
 
     <application
         android:allowBackup="true"
@@ -15,11 +11,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-        <service
-            android:name=".DumpFileWordsService"
-            android:exported="false"></service>
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:requestLegacyExternalStorage="true">
+        <!-- TODO get rid of requestLegacyExternalStorage-->
 
         <activity android:name=".mvp.ui.MainActivity">
             <intent-filter>

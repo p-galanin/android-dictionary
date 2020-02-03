@@ -53,10 +53,10 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
     }
 
     @Override
-    public WordEntry createEntry(final String word, final String translation, final boolean notifyListeners) {
+    public WordEntry createEntry(@NonNull final String word, final String translation, final boolean notifyListeners) {
         final WordEntry entry = this.dbHelper.createWordEntry(word, translation);
         if (notifyListeners) {
-            this.listeners.forEach(Listener::onWordsListChanged);
+            this.listeners.forEach(Listener::onEntriesListChanged);
         }
         return entry;
     }
@@ -67,6 +67,7 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
         return null;
     }
 
+    @NonNull
     @Override
     public Navigator createNavigator() {
         return new SqLiteNavigator(this);
@@ -80,11 +81,11 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
     @Override
     public void deleteEntry(long id) {
         this.dbHelper.removeWordEntry(id);
-        this.listeners.forEach(Listener::onWordsListChanged);
+        this.listeners.forEach(Listener::onEntriesListChanged);
     }
 
     @Override
-    public void dump(final String directory, final DumpCallback callback) {
+    public void dump(@NonNull final String directory, @NonNull final DumpCallback callback) {
 
         final File file = new File(directory, "dump" + System.currentTimeMillis() + ".txt");
         if (!file.exists()) {
@@ -152,7 +153,7 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
             e.printStackTrace();
         }
 
-        this.listeners.forEach(Listener::onWordsListChanged);
+        this.listeners.forEach(Listener::onEntriesListChanged);
 
         if (callback != null) {
             callback.onComplete(restoredCount);
@@ -160,12 +161,12 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
     }
 
     @Override
-    public void registerListener(final Listener listener) {
+    public void registerListener(@NonNull final Listener listener) {
         this.listeners.add(listener);
     }
 
     @Override
-    public void unregisterListener(final Listener listener) {
+    public void unregisterListener(@NonNull final Listener listener) {
         this.listeners.remove(listener); // TODO may cause concurrent modification?
     }
 
