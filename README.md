@@ -1,2 +1,5 @@
 # android-dictionary
-Simple personal dictionary for the most useful words
+Simple dictionary for the personal list of words to remember.
+Features:
+- dump/restore from file
+- daily notification with "the word of the day"
