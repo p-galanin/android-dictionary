@@ -22,7 +22,7 @@ public class PeriodicWorkUtils {
      * @param viewForContext view to get application context, not null
      */
     public static void startWordOfTheDayNotifications(@NonNull final ViewBase viewForContext) {
-        final PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(WordOfTheDayPeriodicWork.class, 15, TimeUnit.MINUTES)
+        final PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(WordOfTheDayPeriodicWork.class, 24, TimeUnit.HOURS)
                 .setInitialDelay(computeInitialDelay(LocalTime.now()))
                 .build();
         final WorkManager manager = WorkManager.getInstance(viewForContext.getContext());
@@ -34,7 +34,7 @@ public class PeriodicWorkUtils {
         final Duration resultDuration;
 
         if (currentTime.isAfter(baseTime)) {
-            resultDuration = Duration.ofHours(24).minus(Duration.between(LocalTime.of(NOTIFICATION_HOUR, 0), currentTime));
+            resultDuration = Duration.ofHours(24).minus(Duration.between(baseTime, currentTime));
         } else {
             resultDuration = Duration.between(currentTime, baseTime);
         }
