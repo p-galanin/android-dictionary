@@ -13,6 +13,7 @@ import com.halo.dictionary.mvp.ui.MainActivity;
 import com.halo.dictionary.repository.DictionaryRepository;
 import com.halo.dictionary.repository.DictionaryRepositoryFactory;
 
+import java.time.LocalTime;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -21,6 +22,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
 
 /**
  * Periodic notification with "the word of the day".
@@ -40,7 +42,7 @@ public class WordOfTheDayPeriodicWork extends Worker {
         final DictionaryRepository repository = DictionaryRepositoryFactory.createDictionaryRepository(getApplicationContext());
         final DictionaryRepository.Navigator navigator = repository.createNavigator();
 
-        if (navigator.getEntriesAmount() > 0) {
+        if (navigator.getEntriesAmount() > 0 && !PeriodicWorkUtils.userMightBeSleeping(LocalTime.now())) {
             final Optional<WordEntry> entryOpt = navigator.getEntryByIndex(
                     ThreadLocalRandom.current().nextInt(1, navigator.getEntriesAmount() + 1));
             entryOpt.ifPresent(entry -> sendWordNotification(entry.getWord(), entry.getTranslation()));

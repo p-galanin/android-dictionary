@@ -62,6 +62,11 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
     }
 
     @Override
+    public Optional<WordEntry> loadEntryByWord(@NonNull final String word) {
+        return this.dbHelper.getWordEntryByWord(word);
+    }
+
+    @Override
     public WordEntry loadEntry() {
         // TODO
         return null;
@@ -134,8 +139,7 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
         try (final Scanner scanner = new Scanner(inputStream)) {
             while (scanner.hasNextLine()) {
                 final Optional<WordEntry> wordEntry = DumpFormat.parseEntry(scanner.nextLine());
-                if (wordEntry.isPresent()) {
-                    // TODO check duplications
+                if (wordEntry.isPresent() && !loadEntryByWord(wordEntry.get().getWord()).isPresent()) {
                     createEntry(wordEntry.get().getWord(), wordEntry.get().getTranslation(), false);
                     restoredCount++;
                 }

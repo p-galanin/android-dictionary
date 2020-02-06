@@ -47,6 +47,11 @@ public interface WordsListPresenter extends PresenterBase<WordsListView> {
     void onDumpToFileClicked();
 
     /**
+     * Performs actions on disable notifications option chosen.
+     */
+    void onDisableNotificationsClicked();
+
+    /**
      * Performs restoring after dump file picked.
      *
      * @param context context, not-null

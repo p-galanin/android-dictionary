@@ -25,6 +25,14 @@ public interface DictionaryRepository {
     WordEntry createEntry(@NonNull String word, String translation, boolean notifyListeners);
 
     /**
+     * Loads entry by it's word value.
+     *
+     * @param word word value, not null
+     * @return first found word entry with such word value or empty object, if there is no entries with such value
+     */
+    Optional<WordEntry> loadEntryByWord(@NonNull final String word);
+
+    /**
      * Creates an instance of entries navigator, connected to this repository.
      * @return created navigator, not null
      */
@@ -74,6 +82,7 @@ public interface DictionaryRepository {
     void shutdown();
 
     WordEntry loadEntry();
+
     void updateEntry(WordEntry wordEntry);
 
 

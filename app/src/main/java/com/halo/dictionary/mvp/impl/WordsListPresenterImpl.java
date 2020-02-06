@@ -109,6 +109,12 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
+    public void onDisableNotificationsClicked() {
+        PeriodicWorkUtils.stopWordOfTheDayNotifications(getView());
+        getView().showMessage("Notifications disabled");
+    }
+
+    @Override
     public void onDumpDirectoryPicked(final Uri uri) {
         final Optional<String> directoryPath = Utils.getDirectoryPathFromUri(uri);
         if (directoryPath.isPresent()) {

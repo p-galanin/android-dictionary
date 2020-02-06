@@ -5,9 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Path;
 import android.util.Log;
 
 import com.halo.dictionary.mvp.WordEntry;
+
+import java.util.Optional;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -66,16 +69,6 @@ public class WordDbHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Получить экземпляр {@link WordDbHelper}
-     *
-     * @return {@link WordDbHelper} или {@code null}, если экземпляр ещё не создан
-     */
-    @Nullable
-    public static synchronized WordDbHelper getInstance() {
-        return INSTANCE;
-    }
-
-    /**
      * Возвращает все хранящиеся в базе записи о словах.
      *
      * @return все хранящиеся записи о словах
@@ -105,6 +98,37 @@ public class WordDbHelper extends SQLiteOpenHelper {
                 null,
                 sortingColumn
         );
+    }
+
+    /**
+     * Loads the word entry by it's word value.
+     *
+     * @param word word value, not null
+     * @return first found word entry with such word value or empty object, if there is no entries with such value
+     */
+    Optional<WordEntry> getWordEntryByWord(@NonNull final String word) {
+        final String[] columns = {
+                WordContract.WordEntry.COLUMN_NAME_WORD,
+                WordContract.WordEntry.COLUMN_NAME_TRANSLATION,
+                WordContract.WordEntry._ID
+        };
+        try (final Cursor found = this.getReadableDatabase().query(
+                WordContract.WordEntry.TABLE_NAME,
+                columns,
+                WordContract.WordEntry.COLUMN_NAME_WORD + "=?",
+                new String[] { word },
+                null,
+                null,
+                null
+        )) {
+            if (found.moveToFirst()) {
+                return Optional.of(new WordEntry(found.getString(found.getColumnIndex(WordContract.WordEntry.COLUMN_NAME_WORD)),
+                        found.getString(found.getColumnIndex(WordContract.WordEntry.COLUMN_NAME_TRANSLATION)),
+                        found.getLong(found.getColumnIndex(WordContract.WordEntry._ID))));
+            } else {
+                return Optional.empty();
+            }
+        }
     }
 
 

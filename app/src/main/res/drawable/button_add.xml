@@ -6,9 +6,16 @@
     android:viewportWidth="24.0">
 
     <item>
-        <shape android:shape="oval">
-            <solid android:color="#e641ff"/>
-            <size android:width="24dp" android:height="24dp"/>
+        <shape android:innerRadius="50dp"
+            android:shape="ring"
+            android:thickness="15dp"
+            android:useLevel="false">
+        <solid
+            android:color="#6B00FFC4">
+        </solid>
+        <size
+            android:height="48dp">
+        </size>
         </shape>
     </item>
 

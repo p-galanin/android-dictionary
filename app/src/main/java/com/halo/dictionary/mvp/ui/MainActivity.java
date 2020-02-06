@@ -198,6 +198,8 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
             this.presenter.onDumpToFileClicked();
         } else if (item.getItemId() == R.id.item_restore) {
             this.presenter.onRestoreFromDumpClicked();
+        } else if (item.getItemId() == R.id.item_stop_notify) {
+            this.presenter.onDisableNotificationsClicked();
         }
         return true;
     }

@@ -9,5 +9,9 @@
         android:id="@+id/item_restore"
         android:title="@string/item_restore_from_file">
     </item>
+    <item
+        android:id="@+id/item_stop_notify"
+        android:title="@string/disable_notifications">
+    </item>
 
 </menu>

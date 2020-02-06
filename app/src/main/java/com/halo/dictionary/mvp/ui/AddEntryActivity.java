@@ -2,6 +2,7 @@ package com.halo.dictionary.mvp.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -10,6 +11,8 @@ import com.halo.dictionary.R;
 import com.halo.dictionary.mvp.AddEntryPresenter;
 import com.halo.dictionary.mvp.AddEntryView;
 import com.halo.dictionary.mvp.impl.AddEntryPresenterImpl;
+
+import java.util.Optional;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +38,9 @@ public class AddEntryActivity extends AppCompatActivity implements AddEntryView 
         this.buttonSave = findViewById(R.id.buttonSaveEntry);
         this.buttonSave.setOnClickListener(v -> AddEntryActivity.this.presenter.onSaveButtonClicked());
 
+        if (this.tvWord.requestFocus()) {
+            getInputMethodManager().ifPresent(manager -> manager.showSoftInput(this.tvWord, InputMethodManager.SHOW_IMPLICIT));
+        }
     }
 
     @Override
@@ -76,5 +82,10 @@ public class AddEntryActivity extends AppCompatActivity implements AddEntryView 
     @Override
     public void executeOnUiThread(@NonNull final Runnable task) {
         runOnUiThread(task);
+    }
+
+    @NonNull
+    private Optional<InputMethodManager> getInputMethodManager() {
+        return Optional.ofNullable((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
     }
 }
