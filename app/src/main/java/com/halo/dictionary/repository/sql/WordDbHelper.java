@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Path;
 import android.util.Log;
 
 import com.halo.dictionary.mvp.WordEntry;
@@ -53,18 +52,32 @@ public class WordDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
         final String SQL_CREATE_WORDS_TABLE =
-                "CREATE TABLE " + WordContract.WordEntry.TABLE_NAME + " (" +
-                        WordContract.WordEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        WordContract.WordEntry.COLUMN_NAME_WORD + " VARCHAR(63) NOT NULL, " +
-                        WordContract.WordEntry.COLUMN_NAME_TRANSLATION + " VARCHAR(511)" +
+                "CREATE TABLE " + WordContract.Entry.TABLE_NAME + " (" +
+                        WordContract.Entry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        WordContract.Entry.COLUMN_NAME_WORD + " VARCHAR(63) NOT NULL, " +
+                        WordContract.Entry.COLUMN_NAME_TRANSLATION + " VARCHAR(511)" +
                         ");";
 
         sqLiteDatabase.execSQL(SQL_CREATE_WORDS_TABLE);
     }
 
+    public boolean update(@NonNull final WordEntry wordEntry) {
+
+        final ContentValues values = new ContentValues();
+        values.put(WordContract.Entry.COLUMN_NAME_WORD, wordEntry.getWord());
+        values.put(WordContract.Entry.COLUMN_NAME_TRANSLATION, wordEntry.getTranslation());
+
+        return getWritableDatabase().update(
+                WordContract.Entry.TABLE_NAME,
+                values,
+                WordContract.Entry._ID + "=?",
+                new String[] { String.valueOf(wordEntry.getId()) }
+                ) > 0;
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + WordContract.WordEntry.TABLE_NAME); // TODO easy, boy
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + WordContract.Entry.TABLE_NAME); // TODO easy, boy
         onCreate(sqLiteDatabase);
     }
 
@@ -74,7 +87,7 @@ public class WordDbHelper extends SQLiteOpenHelper {
      * @return все хранящиеся записи о словах
      */
     public Cursor getAllWordsEntries() {
-        return getAllWordsEntries(WordContract.WordEntry.COLUMN_NAME_WORD);
+        return getAllWordsEntries(WordContract.Entry.COLUMN_NAME_WORD);
     }
 
     /**
@@ -85,12 +98,12 @@ public class WordDbHelper extends SQLiteOpenHelper {
      */
     public Cursor getAllWordsEntries(final String sortingColumn) {
         final String[] columns = {
-                WordContract.WordEntry.COLUMN_NAME_WORD,
-                WordContract.WordEntry.COLUMN_NAME_TRANSLATION,
-                WordContract.WordEntry._ID
+                WordContract.Entry.COLUMN_NAME_WORD,
+                WordContract.Entry.COLUMN_NAME_TRANSLATION,
+                WordContract.Entry._ID
         };
-        return this.getReadableDatabase().query(
-                WordContract.WordEntry.TABLE_NAME,
+        return getReadableDatabase().query(
+                WordContract.Entry.TABLE_NAME,
                 columns,
                 null,
                 null,
@@ -107,28 +120,17 @@ public class WordDbHelper extends SQLiteOpenHelper {
      * @return first found word entry with such word value or empty object, if there is no entries with such value
      */
     Optional<WordEntry> getWordEntryByWord(@NonNull final String word) {
-        final String[] columns = {
-                WordContract.WordEntry.COLUMN_NAME_WORD,
-                WordContract.WordEntry.COLUMN_NAME_TRANSLATION,
-                WordContract.WordEntry._ID
-        };
-        try (final Cursor found = this.getReadableDatabase().query(
-                WordContract.WordEntry.TABLE_NAME,
-                columns,
-                WordContract.WordEntry.COLUMN_NAME_WORD + "=?",
-                new String[] { word },
-                null,
-                null,
-                null
-        )) {
-            if (found.moveToFirst()) {
-                return Optional.of(new WordEntry(found.getString(found.getColumnIndex(WordContract.WordEntry.COLUMN_NAME_WORD)),
-                        found.getString(found.getColumnIndex(WordContract.WordEntry.COLUMN_NAME_TRANSLATION)),
-                        found.getLong(found.getColumnIndex(WordContract.WordEntry._ID))));
-            } else {
-                return Optional.empty();
-            }
-        }
+        return findFirstEntry(WordContract.Entry.COLUMN_NAME_WORD + "=?", new String[] { word });
+    }
+
+    /**
+     * Loads the word entry by it's id.
+     *
+     * @param id entry id, not null
+     * @return word entry with such id or empty object, if there is no one
+     */
+    Optional<WordEntry> getEntryById(@NonNull final Long id) {
+        return findFirstEntry(WordContract.Entry._ID + "=?", new String[] { id.toString() });
     }
 
 
@@ -142,8 +144,8 @@ public class WordDbHelper extends SQLiteOpenHelper {
     public WordEntry createWordEntry(@NonNull final String word, @Nullable final String translation) {
         WordEntry result = null;
 
-        final SQLiteDatabase dbWordsWr = this.getWritableDatabase();
-        long index = this.createWordEntry(word, translation, dbWordsWr);
+        final SQLiteDatabase dbWordsWr = getWritableDatabase();
+        long index = createWordEntry(word, translation, dbWordsWr);
         if (index > 0) {
             result = new WordEntry(word, translation, index);
         }
@@ -158,8 +160,8 @@ public class WordDbHelper extends SQLiteOpenHelper {
      */
     public void removeWordEntry(long id) {
         Log.d(TAG, "Remove " + id);
-        this.getWritableDatabase().delete(
-                WordContract.WordEntry.TABLE_NAME, WordContract.WordEntry._ID + "='" + id + "'", null);
+        getWritableDatabase().delete(
+                WordContract.Entry.TABLE_NAME, WordContract.Entry._ID + "='" + id + "'", null);
     }
 
     /**
@@ -174,12 +176,37 @@ public class WordDbHelper extends SQLiteOpenHelper {
             @NonNull final String word, final String translation, @NonNull SQLiteDatabase dbWordsWr) {
 
         ContentValues values = new ContentValues();
-        values.put(WordContract.WordEntry.COLUMN_NAME_WORD, word);
-        values.put(WordContract.WordEntry.COLUMN_NAME_TRANSLATION, translation);
+        values.put(WordContract.Entry.COLUMN_NAME_WORD, word);
+        values.put(WordContract.Entry.COLUMN_NAME_TRANSLATION, translation);
 
         Log.d(TAG, "Adding new word: " + word + " (" + translation + ")");
 
-        return dbWordsWr.insert(WordContract.WordEntry.TABLE_NAME, null, values);
+        return dbWordsWr.insert(WordContract.Entry.TABLE_NAME, null, values);
+    }
+
+    private Optional<WordEntry> findFirstEntry(final String selection, final String[] selectionArgs) {
+        final String[] columns = {
+                WordContract.Entry.COLUMN_NAME_WORD,
+                WordContract.Entry.COLUMN_NAME_TRANSLATION,
+                WordContract.Entry._ID
+        };
+        try (final Cursor found = getReadableDatabase().query(
+                WordContract.Entry.TABLE_NAME,
+                columns,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        )) {
+            if (found.moveToFirst()) {
+                return Optional.of(new WordEntry(found.getString(found.getColumnIndex(WordContract.Entry.COLUMN_NAME_WORD)),
+                        found.getString(found.getColumnIndex(WordContract.Entry.COLUMN_NAME_TRANSLATION)),
+                        found.getLong(found.getColumnIndex(WordContract.Entry._ID))));
+            } else {
+                return Optional.empty();
+            }
+        }
     }
 
 }

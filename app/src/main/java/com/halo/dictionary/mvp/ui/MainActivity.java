@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
     protected void onDestroy() {
         super.onDestroy();
         this.presenter.detachView();
-        this.presenter.onFinish();
     }
 
     private void init() {
@@ -125,6 +124,11 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
         intent.setAction(Intent.ACTION_OPEN_DOCUMENT_TREE);
         intent.addCategory(Intent.CATEGORY_DEFAULT);
         startActivityForResult(intent, CHOOSE_DIRECTORY_CODE);
+    }
+
+    @Override
+    public void goToEditEntryScreen(final Long entryId) {
+        // TODO start dialog/fragment/activity
     }
 
     @Override

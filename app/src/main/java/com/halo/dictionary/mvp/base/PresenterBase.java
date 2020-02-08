@@ -2,7 +2,7 @@ package com.halo.dictionary.mvp.base;
 
 import androidx.annotation.NonNull;
 
-public interface PresenterBase<T> {
+public interface PresenterBase<T extends ViewBase> {
 
     /**
      * Attaches view to this presenter.

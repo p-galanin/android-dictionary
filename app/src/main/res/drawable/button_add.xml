@@ -6,9 +6,9 @@
     android:viewportWidth="24.0">
 
     <item>
-        <shape android:innerRadius="50dp"
+        <shape
             android:shape="ring"
-            android:thickness="15dp"
+            android:thickness="5dp"
             android:useLevel="false">
         <solid
             android:color="#6B00FFC4">

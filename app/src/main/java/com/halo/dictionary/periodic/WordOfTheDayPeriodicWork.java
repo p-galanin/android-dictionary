@@ -48,7 +48,6 @@ public class WordOfTheDayPeriodicWork extends Worker {
             entryOpt.ifPresent(entry -> sendWordNotification(entry.getWord(), entry.getTranslation()));
         }
 
-        repository.shutdown();
         return Result.success();
     }
 
@@ -67,7 +66,7 @@ public class WordOfTheDayPeriodicWork extends Worker {
                 getApplicationContext(),
                 1,
                 new Intent(getApplicationContext(), MainActivity.class),
-                PendingIntent.FLAG_NO_CREATE);
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         final NotificationCompat.Builder ntfBuilder = new NotificationCompat.Builder(getApplicationContext(), NTF_CHANNEL)
                 .setContentTitle("The word of the day is " + word.toUpperCase() + "!")

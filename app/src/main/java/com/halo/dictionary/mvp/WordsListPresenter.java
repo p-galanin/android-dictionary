@@ -31,6 +31,12 @@ public interface WordsListPresenter extends PresenterBase<WordsListView> {
     void onWordSwiped(@NonNull Long wordId);
 
     /**
+     * Performs actions on long press on entry in list.
+     * @param entryId chosen entry id
+     */
+    void onWordLongPressed(@NonNull Long entryId);
+
+    /**
      * Performs actions on touching some entry.
      * @param entryId touched entry id
      */
@@ -64,12 +70,6 @@ public interface WordsListPresenter extends PresenterBase<WordsListView> {
      * @param uri directory URI, not-null
      */
     void onDumpDirectoryPicked(final Uri uri);
-
-    /**
-     * Callback on view end of life.
-     * For resource cleaning purposes.
-     */
-    void onFinish();
 
     /**
      * Returns the current amount of entries.

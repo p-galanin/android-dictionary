@@ -63,6 +63,11 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
+    public void onWordLongPressed(@NonNull final Long entryId) {
+        getView().goToEditEntryScreen(entryId);
+    }
+
+    @Override
     public void onClickEntry(final Long entryId) {
         if (!this.invisibleTranslations.remove(entryId)) {
             this.invisibleTranslations.add(entryId);
@@ -136,11 +141,6 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
-    public void onFinish() {
-        this.repository.shutdown();
-    }
-
-    @Override
     public boolean isTranslationVisible(final Long entryId) {
         return !this.invisibleTranslations.contains(entryId);
     }
@@ -166,5 +166,11 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     public void onEntriesListChanged() {
         getView().executeOnUiThread(() -> getEntriesNavigator().refresh());
         getView().executeOnUiThread(() -> getView().refreshList());
+    }
+
+    @Override
+    public void onEntryChanged(@NonNull final WordEntry entry) {
+        onEntriesListChanged(); // TODO refresh only changed item
+        getView().executeOnUiThread(() -> getView().showMessage("Edited"));
     }
 }

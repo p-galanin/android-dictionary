@@ -27,4 +27,6 @@ public interface WordsListView extends ViewBase {
      */
     void goToChooseDirectory();
 
+    void goToEditEntryScreen(Long entryId);
+
 }

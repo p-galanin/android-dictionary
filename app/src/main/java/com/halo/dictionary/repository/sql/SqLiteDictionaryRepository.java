@@ -62,14 +62,13 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
     }
 
     @Override
-    public Optional<WordEntry> loadEntryByWord(@NonNull final String word) {
+    public Optional<WordEntry> loadEntryWithWord(@NonNull final String word) {
         return this.dbHelper.getWordEntryByWord(word);
     }
 
     @Override
-    public WordEntry loadEntry() {
-        // TODO
-        return null;
+    public Optional<WordEntry> loadEntry(@NonNull final Long entryId) {
+        return this.dbHelper.getEntryById(entryId);
     }
 
     @NonNull
@@ -80,7 +79,9 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
 
     @Override
     public void updateEntry(final WordEntry wordEntry) {
-        // TODO
+        if (this.dbHelper.update(wordEntry)) {
+            this.listeners.forEach(Listener::onEntriesListChanged);
+        }
     }
 
     @Override
@@ -109,8 +110,8 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
         try (final PrintWriter pw = new PrintWriter(file, StandardCharsets.UTF_8.name())) {
 
             final Cursor wordsCursor = dbHelper.getAllWordsEntries();
-            final int columnWord = wordsCursor.getColumnIndex(WordContract.WordEntry.COLUMN_NAME_WORD);
-            final int columnTrns = wordsCursor.getColumnIndex(WordContract.WordEntry.COLUMN_NAME_TRANSLATION);
+            final int columnWord = wordsCursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_WORD);
+            final int columnTrns = wordsCursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_TRANSLATION);
 
             for (wordsCursor.moveToFirst(); !wordsCursor.isAfterLast(); wordsCursor.moveToNext()) {
                 pw.println(DumpFormat.composeStringEntry(wordsCursor.getString(columnWord), wordsCursor.getString(columnTrns)));
@@ -139,7 +140,7 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
         try (final Scanner scanner = new Scanner(inputStream)) {
             while (scanner.hasNextLine()) {
                 final Optional<WordEntry> wordEntry = DumpFormat.parseEntry(scanner.nextLine());
-                if (wordEntry.isPresent() && !loadEntryByWord(wordEntry.get().getWord()).isPresent()) {
+                if (wordEntry.isPresent() && !loadEntryWithWord(wordEntry.get().getWord()).isPresent()) {
                     createEntry(wordEntry.get().getWord(), wordEntry.get().getTranslation(), false);
                     restoredCount++;
                 }
@@ -172,12 +173,6 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
     @Override
     public void unregisterListener(@NonNull final Listener listener) {
         this.listeners.remove(listener); // TODO may cause concurrent modification?
-    }
-
-    @Override
-    public void shutdown() {
-        this.listeners.clear();
-        this.dbHelper.close();
     }
 
     Cursor getAllEntriesCursor() {

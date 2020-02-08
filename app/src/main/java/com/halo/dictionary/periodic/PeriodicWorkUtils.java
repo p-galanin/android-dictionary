@@ -22,8 +22,9 @@ public class PeriodicWorkUtils {
      * @param viewForContext view to get application context, not null
      */
     public static void startWordOfTheDayNotifications(@NonNull final ViewBase viewForContext) {
-        final PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(WordOfTheDayPeriodicWork.class, 1, TimeUnit.HOURS)
-                .setInitialDelay(computeInitialDelay(LocalTime.now()))
+        // final PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(WordOfTheDayPeriodicWork.class, 1, TimeUnit.HOURS) // TODO restore after debug
+        final PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(WordOfTheDayPeriodicWork.class, 15, TimeUnit.MINUTES)
+                // .setInitialDelay(computeInitialDelay(LocalTime.now())) // TODO remove after debug
                 .build();
         final WorkManager manager = WorkManager.getInstance(viewForContext.getContext());
         manager.enqueueUniquePeriodicWork(WORD_OF_THE_DAY_WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, request);

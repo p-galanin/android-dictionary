@@ -30,9 +30,9 @@ public class SqLiteNavigator implements DictionaryRepository.Navigator {
             return Optional.empty();
         }
 
-        final String word = this.cursor.getString(this.cursor.getColumnIndex(WordContract.WordEntry.COLUMN_NAME_WORD));
-        final String translation = this.cursor.getString(this.cursor.getColumnIndex(WordContract.WordEntry.COLUMN_NAME_TRANSLATION));
-        final long id = this.cursor.getLong(this.cursor.getColumnIndex(WordContract.WordEntry._ID));
+        final String word = this.cursor.getString(this.cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_WORD));
+        final String translation = this.cursor.getString(this.cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_TRANSLATION));
+        final long id = this.cursor.getLong(this.cursor.getColumnIndex(WordContract.Entry._ID));
         return Optional.of(new WordEntry(word, translation, id));
     }
 

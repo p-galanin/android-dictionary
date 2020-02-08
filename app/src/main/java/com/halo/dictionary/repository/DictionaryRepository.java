@@ -30,7 +30,15 @@ public interface DictionaryRepository {
      * @param word word value, not null
      * @return first found word entry with such word value or empty object, if there is no entries with such value
      */
-    Optional<WordEntry> loadEntryByWord(@NonNull final String word);
+    Optional<WordEntry> loadEntryWithWord(@NonNull final String word);
+
+    /**
+     * Loads entry by id.
+     *
+     * @param id entry's id, not null
+     * @return entry with such id or empty object, if there is no one
+     */
+    Optional<WordEntry> loadEntry(@NonNull final Long id);
 
     /**
      * Creates an instance of entries navigator, connected to this repository.
@@ -75,14 +83,6 @@ public interface DictionaryRepository {
      */
     void unregisterListener(@NonNull Listener listener);
 
-    /**
-     * Close this repository.
-     * For resource cleaning purposes.
-     */
-    void shutdown();
-
-    WordEntry loadEntry();
-
     void updateEntry(WordEntry wordEntry);
 
 
@@ -120,6 +120,7 @@ public interface DictionaryRepository {
      */
     interface Listener {
         void onEntriesListChanged();
+        void onEntryChanged(@NonNull final WordEntry entry);
     }
 
 }
