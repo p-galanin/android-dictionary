@@ -42,7 +42,8 @@ public class WordOfTheDayPeriodicWork extends Worker {
         final DictionaryRepository repository = DictionaryRepositoryFactory.createDictionaryRepository(getApplicationContext());
         final DictionaryRepository.Navigator navigator = repository.createNavigator();
 
-        if (navigator.getEntriesAmount() > 0 && !PeriodicWorkUtils.userMightBeSleeping(LocalTime.now())) {
+//        if (navigator.getEntriesAmount() > 0 && !PeriodicWorkUtils.userMightBeSleeping(LocalTime.now())) { TODO return after debug
+        if (navigator.getEntriesAmount() > 0) {
             final Optional<WordEntry> entryOpt = navigator.getEntryByIndex(
                     ThreadLocalRandom.current().nextInt(1, navigator.getEntriesAmount() + 1));
             entryOpt.ifPresent(entry -> sendWordNotification(entry.getWord(), entry.getTranslation()));
@@ -69,8 +70,9 @@ public class WordOfTheDayPeriodicWork extends Worker {
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         final NotificationCompat.Builder ntfBuilder = new NotificationCompat.Builder(getApplicationContext(), NTF_CHANNEL)
-                .setContentTitle("The word of the day is " + word.toUpperCase() + "!")
-                .setContentText("which means '" + translation + "'")
+                .setContentTitle("The word of the hour is " + word.toUpperCase() + "!")
+                .setStyle(new NotificationCompat.InboxStyle()
+                        .addLine("which means " + translation.toUpperCase()))
                 .setContentIntent(intent)
                 .setSmallIcon(R.drawable.button_add) // TODO icon
                 .setAutoCancel(true);
