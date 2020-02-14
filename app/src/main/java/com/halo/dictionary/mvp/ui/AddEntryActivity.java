@@ -60,7 +60,7 @@ public class AddEntryActivity extends AppCompatActivity implements AddEntryView 
 
     @NonNull
     @Override
-    public Context getContext() {
+    public Context getViewContext() {
         return getApplicationContext();
     }
 

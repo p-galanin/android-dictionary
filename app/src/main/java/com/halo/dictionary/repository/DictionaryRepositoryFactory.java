@@ -20,7 +20,7 @@ public class DictionaryRepositoryFactory {
      */
     @NonNull
     public static DictionaryRepository createDictionaryRepository(@NonNull final ViewBase viewBase) {
-        return SqLiteDictionaryRepository.getInstance(viewBase.getContext());
+        return SqLiteDictionaryRepository.getInstance(viewBase.getViewContext());
     }
 
     /**

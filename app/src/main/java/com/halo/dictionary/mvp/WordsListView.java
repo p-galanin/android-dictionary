@@ -2,6 +2,8 @@ package com.halo.dictionary.mvp;
 
 import com.halo.dictionary.mvp.base.ViewBase;
 
+import androidx.annotation.NonNull;
+
 /**
  * Entries list view (main view).
  */
@@ -27,6 +29,6 @@ public interface WordsListView extends ViewBase {
      */
     void goToChooseDirectory();
 
-    void goToEditEntryScreen(Long entryId);
+    void goToEditEntryScreen(@NonNull Long entryId);
 
 }

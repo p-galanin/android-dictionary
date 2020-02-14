@@ -33,6 +33,9 @@ import com.halo.dictionary.mvp.ui.rcclrview.WordsRcclrViewAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -94,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
 
         final FloatingActionButton mFabAddWord = findViewById(R.id.button_add);
         mFabAddWord.setOnClickListener(button -> MainActivity.this.presenter.onAddWordButtonClicked());
+        mFabAddWord.setImageResource(R.drawable.button_add);
 
         this.progressBar = findViewById(R.id.progress_circular);
     }
@@ -127,8 +131,8 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
     }
 
     @Override
-    public void goToEditEntryScreen(final Long entryId) {
-        // TODO start dialog/fragment/activity
+    public void goToEditEntryScreen(@NonNull final Long entryId) {
+        new EditEntryDialogFragment(entryId).show(getSupportFragmentManager(), "EditEntryDialogFragment");
     }
 
     @Override
@@ -138,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
 
     @NonNull
     @Override
-    public Context getContext() {
+    public Context getViewContext() {
         return getApplicationContext();
     }
 

@@ -14,17 +14,17 @@ public interface ViewBase {
      * @return context, not null
      */
     @NonNull
-    Context getContext();
+    Context getViewContext();
 
     /**
      * Displays progress state.
      */
-    void showProgress();
+    default void showProgress() { }
 
     /**
      * Stops displaying progress state.
      */
-    void stopProgress();
+    default void stopProgress() { }
 
     /**
      * Shows message to user.

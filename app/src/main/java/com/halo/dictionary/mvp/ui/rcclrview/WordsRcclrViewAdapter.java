@@ -73,9 +73,14 @@ public class WordsRcclrViewAdapter
             this.presenter = presenter;
 
             view.setOnClickListener(tvView -> {
-                final Long id = Long.parseLong(tvId.getText().toString());
+                final Long id = Long.parseLong(this.tvId.getText().toString());
                 this.presenter.onClickEntry(id);
                 this.tvTranslation.setVisibility(this.presenter.isTranslationVisible(id) ? View.VISIBLE : View.INVISIBLE);
+            });
+
+            view.setOnLongClickListener(tvView -> {
+                this.presenter.onWordLongPressed(Long.parseLong(this.tvId.getText().toString()));
+                return true;
             });
         }
     }

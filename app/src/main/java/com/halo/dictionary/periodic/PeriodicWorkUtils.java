@@ -26,12 +26,12 @@ public class PeriodicWorkUtils {
         final PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(WordOfTheDayPeriodicWork.class, 15, TimeUnit.MINUTES)
                 // .setInitialDelay(computeInitialDelay(LocalTime.now())) // TODO remove after debug
                 .build();
-        final WorkManager manager = WorkManager.getInstance(viewForContext.getContext());
+        final WorkManager manager = WorkManager.getInstance(viewForContext.getViewContext());
         manager.enqueueUniquePeriodicWork(WORD_OF_THE_DAY_WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, request);
     }
 
     public static void stopWordOfTheDayNotifications(@NonNull final ViewBase viewForContext) {
-        final WorkManager manager = WorkManager.getInstance(viewForContext.getContext());
+        final WorkManager manager = WorkManager.getInstance(viewForContext.getViewContext());
         manager.cancelUniqueWork(WORD_OF_THE_DAY_WORK_NAME);
     }
 

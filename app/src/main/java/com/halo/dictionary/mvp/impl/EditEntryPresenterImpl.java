@@ -8,7 +8,7 @@ import com.halo.dictionary.repository.DictionaryRepositoryFactory;
 
 import androidx.annotation.NonNull;
 
-class EditEntryPresenterImpl implements EditEntryPresenter {
+public class EditEntryPresenterImpl implements EditEntryPresenter {
 
     private EditEntryView view;
     private DictionaryRepository repository;
@@ -21,7 +21,6 @@ class EditEntryPresenterImpl implements EditEntryPresenter {
     @Override
     public void onViewInitialized(@NonNull final Long editingEntryId) {
         this.repository.loadEntry(editingEntryId).ifPresent(wordEntry -> {
-            getView().setId(wordEntry.getId());
             getView().setWordText(wordEntry.getWord());
             getView().setTranslationText(wordEntry.getTranslation());
         });
@@ -29,10 +28,10 @@ class EditEntryPresenterImpl implements EditEntryPresenter {
 
     @Override
     public void onSaveButtonClicked() {
-        this.repository.updateEntry(new WordEntry(getView().getWordText(), getView().getTranslationText(), getView().getId()));
+        this.repository.updateEntry(new WordEntry(getView().getWordText(), getView().getTranslationText(), getView().getEntryId()));
         getView().close();
     }
-    
+
     @Override
     public void attachView(@NonNull final EditEntryView view) {
         this.view = view;
