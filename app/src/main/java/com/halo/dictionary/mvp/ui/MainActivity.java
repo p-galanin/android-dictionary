@@ -34,8 +34,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -132,7 +130,11 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
 
     @Override
     public void goToEditEntryScreen(@NonNull final Long entryId) {
-        new EditEntryDialogFragment(entryId).show(getSupportFragmentManager(), "EditEntryDialogFragment");
+        final DialogFragment editEntryFragment = new EditEntryDialogFragment();
+        final Bundle bundle = new Bundle();
+        bundle.putLong(EditEntryDialogFragment.ID_KEY, entryId);
+        editEntryFragment.setArguments(bundle);
+        editEntryFragment.show(getSupportFragmentManager(), "EditEntryDialogFragment");
     }
 
     @Override

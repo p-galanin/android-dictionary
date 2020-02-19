@@ -20,20 +20,24 @@ import androidx.fragment.app.DialogFragment;
 
 public class EditEntryDialogFragment extends DialogFragment implements EditEntryView {
 
-    private final Long processingId;
+    static final String ID_KEY = "processingId";
+
+    private Long processingId;
 
     private EditEntryPresenter presenter;
 
     private EditText wordView;
     private EditText translationView;
 
-    EditEntryDialogFragment(@NonNull final Long id) {
-        this.processingId = id;
-    }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable final Bundle savedInstanceState) {
+
+        if (getArguments() == null) {
+            throw new IllegalStateException("Where is id?");
+        } else {
+            this.processingId = getArguments().getLong(ID_KEY);
+        }
 
         this.presenter = new EditEntryPresenterImpl(this);
 
