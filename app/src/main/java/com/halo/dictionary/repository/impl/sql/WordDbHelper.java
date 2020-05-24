@@ -1,4 +1,4 @@
-package com.halo.dictionary.repository.sql;
+package com.halo.dictionary.repository.impl.sql;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -200,13 +200,17 @@ public class WordDbHelper extends SQLiteOpenHelper {
                 null
         )) {
             if (found.moveToFirst()) {
-                return Optional.of(new WordEntry(found.getString(found.getColumnIndex(WordContract.Entry.COLUMN_NAME_WORD)),
-                        found.getString(found.getColumnIndex(WordContract.Entry.COLUMN_NAME_TRANSLATION)),
-                        found.getLong(found.getColumnIndex(WordContract.Entry._ID))));
+                return Optional.of(composeWordEntryByCursor(found));
             } else {
                 return Optional.empty();
             }
         }
+    }
+
+    private WordEntry composeWordEntryByCursor(@NonNull final Cursor cursor) {
+        return new WordEntry(cursor.getString(cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_WORD)),
+                cursor.getString(cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_TRANSLATION)),
+                cursor.getLong(cursor.getColumnIndex(WordContract.Entry._ID)));
     }
 
 }

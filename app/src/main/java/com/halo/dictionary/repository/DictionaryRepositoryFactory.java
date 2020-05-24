@@ -3,7 +3,7 @@ package com.halo.dictionary.repository;
 import android.content.Context;
 
 import com.halo.dictionary.mvp.base.ViewBase;
-import com.halo.dictionary.repository.sql.SqLiteDictionaryRepository;
+import com.halo.dictionary.repository.impl.sql.SqLiteDictionaryRepository;
 
 import androidx.annotation.NonNull;
 

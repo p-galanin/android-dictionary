@@ -1,4 +1,4 @@
-package com.halo.dictionary.repository.sql;
+package com.halo.dictionary.repository.impl.sql;
 
 import android.content.Context;
 import android.database.Cursor;

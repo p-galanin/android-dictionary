@@ -1,9 +1,12 @@
 package com.halo.dictionary.periodic;
 
 import com.halo.dictionary.mvp.base.ViewBase;
+import com.halo.dictionary.repository.PreferencesHelper;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.OptionalInt;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
@@ -15,6 +18,11 @@ public class PeriodicWorkUtils {
 
     private static final String WORD_OF_THE_DAY_WORK_NAME = "WordOfTheDay";
     private static int NOTIFICATION_HOUR = 12;
+
+    static final int BLOCK_SIZE = 10;
+    static final int THRESHOLD_FOR_BLOCK_SIZE = 50;
+
+    private static final Random randomGenerator = new Random();
 
     /**
      * Starts (if not started) the periodic notification with the word of the day.
@@ -56,5 +64,31 @@ public class PeriodicWorkUtils {
     static boolean userMightBeSleeping(@NonNull final LocalTime currentTime) {
         return currentTime.getHour() < 12 || currentTime.getHour() > 21;
     }
+
+    static OptionalInt getNextRandomIndex(final int overallAmount, final PreferencesHelper preferencesHelper) {
+
+        if (overallAmount == 0) {
+            return OptionalInt.empty();
+        }
+
+        int blockSize = computeBlockSize(overallAmount);
+
+        if (overallAmount < blockSize * 2) { // two blocks min
+            return OptionalInt.of(randomGenerator.nextInt(overallAmount));
+        }
+
+        int blocksAmount = overallAmount / blockSize;
+
+        final int currentBlockNumber = preferencesHelper.updateBlockNumber(blocksAmount);
+        final int result = currentBlockNumber * blockSize + randomGenerator.nextInt(
+                currentBlockNumber == blocksAmount - 1 ? (blockSize + overallAmount % blockSize) : blockSize);
+
+        return OptionalInt.of(result);
+    }
+
+    private static int computeBlockSize(final int overallAmount) {
+        return overallAmount < THRESHOLD_FOR_BLOCK_SIZE ? BLOCK_SIZE / 2 : BLOCK_SIZE;
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package com.halo.dictionary.periodic;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,10 +13,11 @@ import com.halo.dictionary.mvp.WordEntry;
 import com.halo.dictionary.mvp.ui.MainActivity;
 import com.halo.dictionary.repository.DictionaryRepository;
 import com.halo.dictionary.repository.DictionaryRepositoryFactory;
+import com.halo.dictionary.repository.impl.PreferencesHelperImpl;
 
-import java.time.LocalTime;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.OptionalInt;
+import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -31,6 +33,7 @@ public class WordOfTheDayPeriodicWork extends Worker {
 
     private static final String NTF_CHANNEL = "THE_WORD_OF_THE_DAY";
     private static final int NTF_ID = 100;
+    private static final int AMOUNT_OF_NTF = 2;
 
     public WordOfTheDayPeriodicWork(@NonNull final Context context, @NonNull final WorkerParameters workerParams) {
         super(context, workerParams);
@@ -44,15 +47,21 @@ public class WordOfTheDayPeriodicWork extends Worker {
 
 //        if (navigator.getEntriesAmount() > 0 && !PeriodicWorkUtils.userMightBeSleeping(LocalTime.now())) { TODO return after debug
         if (navigator.getEntriesAmount() > 0) {
-            final Optional<WordEntry> entryOpt = navigator.getEntryByIndex(
-                    ThreadLocalRandom.current().nextInt(1, navigator.getEntriesAmount() + 1));
-            entryOpt.ifPresent(entry -> sendWordNotification(entry.getWord(), entry.getTranslation()));
+            for (int i = 0; i < AMOUNT_OF_NTF; i++) {
+                final OptionalInt randomIndex = PeriodicWorkUtils.getNextRandomIndex(
+                        navigator.getEntriesAmount(), new PreferencesHelperImpl(getApplicationContext()));
+                if (randomIndex.isPresent()) {
+                    final Optional<WordEntry> entryOpt = navigator.getEntryByIndex(randomIndex.getAsInt());
+                    final int notificationOrderNumber = i;
+                    entryOpt.ifPresent(entry -> sendWordNotification(entry, notificationOrderNumber));
+                }
+            }
         }
 
         return Result.success();
     }
 
-    private void sendWordNotification(@NonNull final String word, @NonNull final String translation) {
+    private void sendWordNotification(@NonNull final WordEntry wordEntry, final int notificationOrderNumber) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final NotificationManager manager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -63,21 +72,40 @@ public class WordOfTheDayPeriodicWork extends Worker {
             }
         }
 
-        final PendingIntent intent = PendingIntent.getActivity(
+        final NotificationManagerCompat manager = NotificationManagerCompat.from(getApplicationContext());
+        manager.notify(NTF_ID + notificationOrderNumber, buildNotification(wordEntry));
+    }
+
+    private Notification buildNotification(final WordEntry wordEntry) {
+        final boolean isReverseTranslateDirection = new Random().nextBoolean();
+        final String title = isReverseTranslateDirection ? wordEntry.getTranslation() : wordEntry.getWord();
+        final String text = isReverseTranslateDirection ? wordEntry.getWord() : wordEntry.getTranslation();
+        return new NotificationCompat.Builder(getApplicationContext(), NTF_CHANNEL)
+                .setContentTitle(title.toUpperCase())
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .setBigContentTitle(text)
+                        .bigText("\n\n\n"))
+                .setContentIntent(createIntent())
+                .setSmallIcon(R.drawable.button_add) // TODO icon
+                .extend(new NotificationCompat.WearableExtender()
+                        .addPage(createWearSecondPage(wordEntry, isReverseTranslateDirection))
+                )
+                .setAutoCancel(true)
+                .build();
+    }
+
+    private PendingIntent createIntent() {
+        return PendingIntent.getActivity(
                 getApplicationContext(),
                 1,
                 new Intent(getApplicationContext(), MainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
+    }
 
-        final NotificationCompat.Builder ntfBuilder = new NotificationCompat.Builder(getApplicationContext(), NTF_CHANNEL)
-                .setContentTitle("The word of the hour is " + word.toUpperCase() + "!")
-                .setStyle(new NotificationCompat.InboxStyle()
-                        .addLine("which means " + translation.toUpperCase()))
-                .setContentIntent(intent)
-                .setSmallIcon(R.drawable.button_add) // TODO icon
-                .setAutoCancel(true);
-
-        final NotificationManagerCompat manager = NotificationManagerCompat.from(getApplicationContext());
-        manager.notify(NTF_ID, ntfBuilder.build());
+    private Notification createWearSecondPage(final WordEntry wordEntry, final boolean isReverseTranslationDirection) {
+        return new NotificationCompat.Builder(getApplicationContext(), NTF_CHANNEL)
+                .setContentTitle(isReverseTranslationDirection ? wordEntry.getWord() : wordEntry.getTranslation())
+                .setAutoCancel(true)
+                .build();
     }
 }
