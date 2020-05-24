@@ -104,7 +104,8 @@ public class WordOfTheDayPeriodicWork extends Worker {
 
     private Notification createWearSecondPage(final WordEntry wordEntry, final boolean isReverseTranslationDirection) {
         return new NotificationCompat.Builder(getApplicationContext(), NTF_CHANNEL)
-                .setContentTitle(isReverseTranslationDirection ? wordEntry.getWord() : wordEntry.getTranslation())
+                .setStyle(new NotificationCompat.BigTextStyle())
+                .setContentText(isReverseTranslationDirection ? wordEntry.getWord() : wordEntry.getTranslation())
                 .setAutoCancel(true)
                 .build();
     }
