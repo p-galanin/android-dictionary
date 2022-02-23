@@ -1,6 +1,6 @@
 package com.halo.dictionary.repository;
 
-import com.halo.dictionary.mvp.WordEntry;
+import com.halo.dictionary.mvp.WordEntryKt;
 import com.halo.dictionary.repository.dump.DumpCallback;
 import com.halo.dictionary.repository.dump.RestoreFromDumpCallback;
 
@@ -22,7 +22,24 @@ public interface DictionaryRepository {
      * @param notifyListeners whether notify the listeners of data changes
      * @return created entry or {@code null} if entry was not created
      */
-    WordEntry createEntry(@NonNull String word, String translation, boolean notifyListeners);
+    WordEntryKt saveEntry(@NonNull String word, String translation, boolean notifyListeners);
+
+    /**
+     * Creates and persists entry with specified values.
+     *
+     * @param word word, not null
+     * @param translation translation, nullable
+     * @param isArchived is in archive
+     * @param weight weight
+     * @param notifyListeners whether notify the listeners of data changes
+     * @return created entry or {@code null} if entry was not created
+     */
+    WordEntryKt saveEntry(@NonNull final String word,
+                        final String translation,
+                        final boolean isArchived,
+                        final int weight,
+                        final boolean notifyListeners);
+
 
     /**
      * Loads entry by it's word value.
@@ -30,7 +47,7 @@ public interface DictionaryRepository {
      * @param word word value, not null
      * @return first found word entry with such word value or empty object, if there is no entries with such value
      */
-    Optional<WordEntry> loadEntryWithWord(@NonNull final String word);
+    Optional<WordEntryKt> loadEntryWithWord(@NonNull final String word);
 
     /**
      * Loads entry by id.
@@ -38,14 +55,14 @@ public interface DictionaryRepository {
      * @param id entry's id, not null
      * @return entry with such id or empty object, if there is no one
      */
-    Optional<WordEntry> loadEntry(@NonNull final Long id);
+    Optional<WordEntryKt> loadEntry(@NonNull final Long id);
 
     /**
      * Creates an instance of entries navigator, connected to this repository.
      * @return created navigator, not null
      */
     @NonNull
-    Navigator createNavigator();
+    Navigator createNavigator(boolean withArchived);
 
     /**
      * Deletes an entry with specified ID.
@@ -83,7 +100,7 @@ public interface DictionaryRepository {
      */
     void unregisterListener(@NonNull Listener listener);
 
-    void updateEntry(WordEntry wordEntry);
+    void updateEntry(WordEntryKt WordEntryKt);
 
 
     /**
@@ -104,7 +121,7 @@ public interface DictionaryRepository {
          * @param index specified index, positive
          * @return entry from the specified position or empty object, if this position is empty
          */
-        Optional<WordEntry> getEntryByIndex(int index);
+        Optional<WordEntryKt> getEntryByIndex(int index);
 
         /**
          * Forces the data set (entries list) refresh.
@@ -120,7 +137,7 @@ public interface DictionaryRepository {
      */
     interface Listener {
         void onEntriesListChanged();
-        void onEntryChanged(@NonNull final WordEntry entry);
+        void onEntryChanged(@NonNull final WordEntryKt entry);
     }
 
 }

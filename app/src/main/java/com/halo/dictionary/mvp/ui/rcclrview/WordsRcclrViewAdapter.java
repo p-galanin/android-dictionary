@@ -3,6 +3,7 @@ package com.halo.dictionary.mvp.ui.rcclrview;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.halo.dictionary.R;
@@ -47,6 +48,7 @@ public class WordsRcclrViewAdapter
             holder.tvTranslation.setText(wordEntry.getTranslation());
             holder.tvId.setText(String.valueOf(wordEntry.getId()));
             holder.tvTranslation.setVisibility(this.presenter.isTranslationVisible(wordEntry.getId()) ? View.VISIBLE : View.INVISIBLE);
+            holder.isArchivedView.setChecked(wordEntry.isArchived());
         });
     }
 
@@ -63,6 +65,7 @@ public class WordsRcclrViewAdapter
         TextView tvId;
         TextView tvWord;
         TextView tvTranslation;
+        CheckBox isArchivedView;
         WordsListPresenter presenter;
 
         EntryViewHolder(View view, WordsListPresenter presenter) {
@@ -70,6 +73,7 @@ public class WordsRcclrViewAdapter
             this.tvId = view.findViewById(R.id.tv_c_rcclr_view_words_id);
             this.tvWord = view.findViewById(R.id.tv_c_rcclr_view_words_word);
             this.tvTranslation = view.findViewById(R.id.tv_c_rcclr_view_words_translation);
+            this.isArchivedView = view.findViewById(R.id.is_archived);
             this.presenter = presenter;
 
             view.setOnClickListener(tvView -> {
@@ -81,6 +85,11 @@ public class WordsRcclrViewAdapter
             view.setOnLongClickListener(tvView -> {
                 this.presenter.onWordLongPressed(Long.parseLong(this.tvId.getText().toString()));
                 return true;
+            });
+
+            this.isArchivedView.setOnClickListener(checkBoxView -> {
+                final Long id = Long.parseLong(this.tvId.getText().toString());
+                this.presenter.onArchiveClicked(id);
             });
         }
     }

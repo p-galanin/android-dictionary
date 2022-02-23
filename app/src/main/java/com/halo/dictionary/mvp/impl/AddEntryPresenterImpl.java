@@ -28,7 +28,7 @@ public class AddEntryPresenterImpl implements AddEntryPresenter {
         final String translation = getView().getEnteredTranslation();
 
         if (validateInput(word, translation)) {
-            this.repository.createEntry(word, translation, true);
+            this.repository.saveEntry(word, translation, true);
             getView().showMessage("Word added");
             getView().close();
         }

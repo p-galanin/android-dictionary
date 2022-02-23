@@ -2,6 +2,7 @@ package com.halo.dictionary.mvp;
 
 import com.halo.dictionary.mvp.base.ViewBase;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -13,7 +14,7 @@ public interface AddEntryView extends ViewBase {
      * Returns entered word value.
      * @return entered word value, may be null (hypothetically)
      */
-    @Nullable
+    @NonNull
     String getEnteredWord();
 
     /**

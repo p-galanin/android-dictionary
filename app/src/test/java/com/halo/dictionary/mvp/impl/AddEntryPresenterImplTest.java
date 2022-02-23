@@ -70,7 +70,7 @@ public class AddEntryPresenterImplTest {
 
         presenter.onSaveButtonClicked();
 
-        verify(mockedRepository, times(1)).createEntry(word, translation, true);
+        verify(mockedRepository, times(1)).saveEntry(word, translation, true);
         verify(view, times(1)).close();
     }
 
@@ -87,7 +87,7 @@ public class AddEntryPresenterImplTest {
 
         presenter.onSaveButtonClicked();
 
-        verify(mockedRepository, times(0)).createEntry(anyString(), anyString(), anyBoolean());
+        verify(mockedRepository, times(0)).saveEntry(anyString(), anyString(), anyBoolean());
         verify(view, times(0)).close();
     }
 }

@@ -16,7 +16,8 @@ public class WordContract {
         public static final String TABLE_NAME = "words";
         public static final String COLUMN_NAME_WORD = "word";
         public static final String COLUMN_NAME_TRANSLATION = "translation";
-
+        public static final String COLUMN_NAME_IS_ARCHIVED = "is_archived";
+        public static final String COLUMN_NAME_WEIGHT = "weight";
     }
 
 }

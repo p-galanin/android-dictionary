@@ -3,10 +3,10 @@ package com.halo.dictionary.mvp.impl;
 import android.content.Context;
 import android.net.Uri;
 
-import com.halo.dictionary.mvp.base.Utils;
-import com.halo.dictionary.mvp.WordEntry;
+import com.halo.dictionary.mvp.WordEntryKt;
 import com.halo.dictionary.mvp.WordsListPresenter;
 import com.halo.dictionary.mvp.WordsListView;
+import com.halo.dictionary.mvp.base.Utils;
 import com.halo.dictionary.periodic.PeriodicWorkUtils;
 import com.halo.dictionary.repository.DictionaryRepository;
 import com.halo.dictionary.repository.DictionaryRepositoryFactory;
@@ -25,12 +25,12 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     final private DictionaryRepository repository;
     final private DictionaryRepository.Navigator navigator;
 
-    private Set<Long> invisibleTranslations = new HashSet<>();
+    private final Set<Long> invisibleTranslations = new HashSet<>();
 
     public WordsListPresenterImpl(@NonNull final WordsListView view) {
         attachView(view);
         this.repository = DictionaryRepositoryFactory.createDictionaryRepository(getView());
-        this.navigator = this.repository.createNavigator();
+        this.navigator = this.repository.createNavigator(true);
         this.repository.registerListener(this);
     }
 
@@ -76,7 +76,7 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
-    public Optional<WordEntry> getEntryForPosition(final int position) {
+    public Optional<WordEntryKt> getEntryForPosition(final int position) {
         return getEntriesNavigator().getEntryByIndex(position);
     }
 
@@ -169,8 +169,23 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
-    public void onEntryChanged(@NonNull final WordEntry entry) {
+    public void onEntryChanged(@NonNull final WordEntryKt entry) {
         onEntriesListChanged(); // TODO refresh only changed item
         getView().executeOnUiThread(() -> getView().showMessage("Edited"));
+    }
+
+    @Override
+    public void onArchiveClicked(@NonNull Long wordId) {
+        this.repository.loadEntry(wordId).ifPresent(wordEntry -> {
+            WordEntryKt updatedEntry = new WordEntryKt(
+                    wordEntry.getWord(),
+                    wordEntry.getTranslation(),
+                    wordEntry.getWeight(),
+                    !wordEntry.isArchived(),
+                    wordEntry.getId()
+            );
+            this.repository.updateEntry(updatedEntry);
+            this.view.refreshList();
+        });
     }
 }

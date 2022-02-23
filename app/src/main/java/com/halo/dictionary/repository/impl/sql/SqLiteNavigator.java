@@ -2,7 +2,7 @@ package com.halo.dictionary.repository.impl.sql;
 
 import android.database.Cursor;
 
-import com.halo.dictionary.mvp.WordEntry;
+import com.halo.dictionary.mvp.WordEntryKt;
 import com.halo.dictionary.repository.DictionaryRepository;
 
 import java.util.Optional;
@@ -14,9 +14,13 @@ public class SqLiteNavigator implements DictionaryRepository.Navigator {
     private Cursor cursor;
     final private SqLiteDictionaryRepository repository;
 
-    SqLiteNavigator(@NonNull final SqLiteDictionaryRepository repository) {
+    SqLiteNavigator(@NonNull final SqLiteDictionaryRepository repository, boolean withArchived) {
         this.repository = repository;
-        this.cursor = this.repository.getAllEntriesCursor();
+        if (withArchived) {
+            this.cursor = this.repository.getAllEntriesCursor();
+        } else {
+            this.cursor = this.repository.getNotArchivedEntriesCursor();
+        }
     }
 
     @Override
@@ -25,7 +29,7 @@ public class SqLiteNavigator implements DictionaryRepository.Navigator {
     }
 
     @Override
-    public Optional<WordEntry> getEntryByIndex(final int index) {
+    public Optional<WordEntryKt> getEntryByIndex(final int index) {
         if (!this.cursor.moveToPosition(index)) {
             return Optional.empty();
         }
@@ -33,7 +37,10 @@ public class SqLiteNavigator implements DictionaryRepository.Navigator {
         final String word = this.cursor.getString(this.cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_WORD));
         final String translation = this.cursor.getString(this.cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_TRANSLATION));
         final long id = this.cursor.getLong(this.cursor.getColumnIndex(WordContract.Entry._ID));
-        return Optional.of(new WordEntry(word, translation, id));
+        final boolean isArchived = this.cursor.getInt(this.cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_IS_ARCHIVED)) == 1;
+        final int weight = this.cursor.getInt(this.cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_WEIGHT));
+        // todo one time from db
+        return Optional.of(new WordEntryKt(word, translation, weight, isArchived, id));
     }
 
     @Override

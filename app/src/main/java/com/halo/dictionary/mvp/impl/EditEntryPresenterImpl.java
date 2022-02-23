@@ -2,16 +2,19 @@ package com.halo.dictionary.mvp.impl;
 
 import com.halo.dictionary.mvp.EditEntryPresenter;
 import com.halo.dictionary.mvp.EditEntryView;
-import com.halo.dictionary.mvp.WordEntry;
+import com.halo.dictionary.mvp.WordEntryKt;
 import com.halo.dictionary.repository.DictionaryRepository;
 import com.halo.dictionary.repository.DictionaryRepositoryFactory;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class EditEntryPresenterImpl implements EditEntryPresenter {
 
     private EditEntryView view;
     private DictionaryRepository repository;
+    @Nullable
+    private WordEntryKt currentEntry;
     
     public EditEntryPresenterImpl(@NonNull final EditEntryView view) {
         attachView(view);
@@ -23,12 +26,21 @@ public class EditEntryPresenterImpl implements EditEntryPresenter {
         this.repository.loadEntry(editingEntryId).ifPresent(wordEntry -> {
             getView().setWordText(wordEntry.getWord());
             getView().setTranslationText(wordEntry.getTranslation());
+            this.currentEntry = wordEntry;
         });
     }
 
     @Override
     public void onSaveButtonClicked() {
-        this.repository.updateEntry(new WordEntry(getView().getWordText(), getView().getTranslationText(), getView().getEntryId()));
+        this.repository.updateEntry(
+                new WordEntryKt(
+                        getView().getWordText(),
+                        getView().getTranslationText(),
+                        currentEntry == null ? 0 : currentEntry.getWeight(),
+                        currentEntry != null && currentEntry.isArchived(),
+                        getView().getEntryId()
+                )
+        );
         getView().close();
     }
 

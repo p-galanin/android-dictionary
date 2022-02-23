@@ -83,7 +83,7 @@ public interface WordsListPresenter extends PresenterBase<WordsListView> {
      * @param position specified position, positive
      * @return entry from specified position or empty object, if this position is empty
      */
-    Optional<WordEntry> getEntryForPosition(int position);
+    Optional<WordEntryKt> getEntryForPosition(int position);
 
     /**
      * Determines whether an entry translation should be displayed or hidden.
@@ -93,4 +93,5 @@ public interface WordsListPresenter extends PresenterBase<WordsListView> {
     boolean isTranslationVisible(Long entryId);
 
 
+    void onArchiveClicked(@NonNull Long wordId);
 }

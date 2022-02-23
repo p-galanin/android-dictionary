@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
-import com.halo.dictionary.mvp.WordEntry;
+import com.halo.dictionary.mvp.WordEntryKt;
 import com.halo.dictionary.repository.DictionaryRepository;
 import com.halo.dictionary.repository.dump.DumpCallback;
 import com.halo.dictionary.repository.dump.DumpFormat;
@@ -53,8 +53,8 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
     }
 
     @Override
-    public WordEntry createEntry(@NonNull final String word, final String translation, final boolean notifyListeners) {
-        final WordEntry entry = this.dbHelper.createWordEntry(word, translation);
+    public WordEntryKt saveEntry(@NonNull final String word, final String translation, final boolean notifyListeners) {
+        final WordEntryKt entry = this.dbHelper.saveWordEntry(new WordEntryKt(word, translation));
         if (notifyListeners) {
             this.listeners.forEach(Listener::onEntriesListChanged);
         }
@@ -62,23 +62,37 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
     }
 
     @Override
-    public Optional<WordEntry> loadEntryWithWord(@NonNull final String word) {
+    public WordEntryKt saveEntry(
+            @NonNull final String word,
+            final String translation,
+            final boolean isArchived,
+            final int weight,
+            final boolean notifyListeners) {
+        final WordEntryKt entry = this.dbHelper.saveWordEntry(new WordEntryKt(word, translation, weight, isArchived));
+        if (notifyListeners) {
+            this.listeners.forEach(Listener::onEntriesListChanged);
+        }
+        return entry;
+    }
+
+    @Override
+    public Optional<WordEntryKt> loadEntryWithWord(@NonNull final String word) {
         return this.dbHelper.getWordEntryByWord(word);
     }
 
     @Override
-    public Optional<WordEntry> loadEntry(@NonNull final Long entryId) {
+    public Optional<WordEntryKt> loadEntry(@NonNull final Long entryId) {
         return this.dbHelper.getEntryById(entryId);
     }
 
     @NonNull
     @Override
-    public Navigator createNavigator() {
-        return new SqLiteNavigator(this);
+    public Navigator createNavigator(boolean withArchived) {
+        return new SqLiteNavigator(this, withArchived);
     }
 
     @Override
-    public void updateEntry(final WordEntry wordEntry) {
+    public void updateEntry(final WordEntryKt wordEntry) {
         if (this.dbHelper.update(wordEntry)) {
             this.listeners.forEach(Listener::onEntriesListChanged);
         }
@@ -112,9 +126,16 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
             final Cursor wordsCursor = dbHelper.getAllWordsEntries();
             final int columnWord = wordsCursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_WORD);
             final int columnTrns = wordsCursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_TRANSLATION);
+            final int columnIsArchived = wordsCursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_IS_ARCHIVED);
+            final int columnWeight = wordsCursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_WEIGHT);
 
             for (wordsCursor.moveToFirst(); !wordsCursor.isAfterLast(); wordsCursor.moveToNext()) {
-                pw.println(DumpFormat.composeStringEntry(wordsCursor.getString(columnWord), wordsCursor.getString(columnTrns)));
+                pw.println(DumpFormat.serializeEntry(
+                        wordsCursor.getString(columnWord),
+                        wordsCursor.getString(columnTrns),
+                        wordsCursor.getInt(columnWeight),
+                        wordsCursor.getInt(columnIsArchived) == 1
+                ));
             }
 
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
@@ -139,9 +160,9 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
 
         try (final Scanner scanner = new Scanner(inputStream)) {
             while (scanner.hasNextLine()) {
-                final Optional<WordEntry> wordEntry = DumpFormat.parseEntry(scanner.nextLine());
-                if (wordEntry.isPresent() && !loadEntryWithWord(wordEntry.get().getWord()).isPresent()) {
-                    createEntry(wordEntry.get().getWord(), wordEntry.get().getTranslation(), false);
+                final Optional<WordEntryKt> WordEntryKt = DumpFormat.parseEntry(scanner.nextLine());
+                if (WordEntryKt.isPresent() && !loadEntryWithWord(WordEntryKt.get().getWord()).isPresent()) {
+                    saveEntry(WordEntryKt.get().getWord(), WordEntryKt.get().getTranslation(), false);
                     restoredCount++;
                 }
                 overallCount++;
@@ -177,5 +198,9 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
 
     Cursor getAllEntriesCursor() {
         return this.dbHelper.getAllWordsEntries();
+    }
+
+    Cursor getNotArchivedEntriesCursor() {
+        return this.dbHelper.getNotArchivedWordsEntries();
     }
 }

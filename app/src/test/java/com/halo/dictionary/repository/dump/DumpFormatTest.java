@@ -1,8 +1,6 @@
 package com.halo.dictionary.repository.dump;
 
-import android.util.Pair;
-
-import com.halo.dictionary.mvp.WordEntry;
+import com.halo.dictionary.mvp.WordEntryKt;
 
 import org.junit.Test;
 
@@ -11,8 +9,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+import static com.halo.dictionary.repository.dump.DumpFormat.DEFAULT_TRANSLATION;
 import static org.junit.Assert.*;
 
 public class DumpFormatTest {
@@ -22,25 +20,31 @@ public class DumpFormatTest {
 
         final Map<String, String> source = new LinkedHashMap<>();
         final List<String> dumped = new ArrayList<>();
-        final Map<String, String> restored = new LinkedHashMap<>();
+        final Map<String, WordEntryKt> restored = new HashMap<>(source.size());
+        final boolean isArchived = false;
+        final int weight = 42;
 
         source.put("apple", "яблоко");
         source.put("arrogant", "высокомерный, надменный");
         source.put("empty", "");
 
-        source.forEach((word, translation) -> dumped.add(DumpFormat.composeStringEntry(word, translation)));
+        source.forEach((word, translation) ->
+                dumped.add(DumpFormat.serializeEntry(word, translation, weight, isArchived))
+        );
         dumped.add("i'm incorrect");
 
         for (final String entryString : dumped) {
-            DumpFormat.parseEntry(entryString).ifPresent(wordEntry -> restored.put(wordEntry.getWord(), wordEntry.getTranslation()));
+            DumpFormat.parseEntry(entryString).ifPresent(entry -> restored.put(entry.getWord(), entry));
         }
 
         assertEquals(source.size(), restored.size());
         source.forEach((word, translation) -> {
-            final String restoredTranslation = restored.get(word);
-            assertEquals(translation, restoredTranslation);
+            WordEntryKt entry = restored.get(word);
+            assertNotNull(entry);
+            assertEquals(translation.isEmpty() ? DEFAULT_TRANSLATION : translation, entry.getTranslation());
+            assertEquals(isArchived, entry.isArchived());
+            assertEquals(weight, entry.getWeight());
         });
-
     }
 
 }
