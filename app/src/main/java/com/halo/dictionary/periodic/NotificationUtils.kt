@@ -15,7 +15,7 @@ internal fun buildNotification(
     title: String,
     text: String,
     notificationId: Int,
-    withActions: Boolean,
+    actions: List<NotificationAction>
 ): Notification {
     val builder = NotificationCompat.Builder(context, NTF_CHANNEL)
         .setContentTitle(title)
@@ -28,18 +28,8 @@ internal fun buildNotification(
         )
         .setAutoCancel(true)
 
-    // todo pg refactor: deduplicate ntf sending code
-    if (withActions) {
-        builder.addAction(
-            R.drawable.button_add,
-            "Known",
-            createHideNotificationIntent(context, notificationId)
-        )
-        builder.addAction(
-            R.drawable.button_add,
-            "Show",
-            creteShowTranslationEvent(context, notificationId)
-        )
+    actions.forEach {
+        it.addToNotificationBuilder(notificationId, builder, context)
     }
 
     return builder.build()
@@ -63,22 +53,4 @@ private fun createWearSecondPage(
         .setContentText(text)
         .setAutoCancel(true)
         .build()
-}
-
-private fun createHideNotificationIntent(context: Context, notificationId: Int): PendingIntent {
-    return PendingIntent.getBroadcast(
-        context,
-        2,
-        Intent(context, NotificationActionReceiver::class.java),
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-}
-
-private fun creteShowTranslationEvent(context: Context, notificationId: Int): PendingIntent {
-    return PendingIntent.getBroadcast(
-        context,
-        3,
-        Intent(context, NotificationActionReceiver::class.java),
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
 }

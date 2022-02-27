@@ -47,6 +47,7 @@ public class WordsRcclrViewAdapter
             holder.tvWord.setText(wordEntry.getWord());
             holder.tvTranslation.setText(wordEntry.getTranslation());
             holder.tvId.setText(String.valueOf(wordEntry.getId()));
+            holder.tvWeight.setText("Weight: " + wordEntry.getWeight());
             holder.tvTranslation.setVisibility(this.presenter.isTranslationVisible(wordEntry.getId()) ? View.VISIBLE : View.INVISIBLE);
             holder.isArchivedView.setChecked(wordEntry.isArchived());
         });
@@ -62,15 +63,17 @@ public class WordsRcclrViewAdapter
      */
     static class EntryViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvId;
-        TextView tvWord;
-        TextView tvTranslation;
-        CheckBox isArchivedView;
-        WordsListPresenter presenter;
+        final TextView tvId;
+        final TextView tvWeight;
+        final TextView tvWord;
+        final TextView tvTranslation;
+        final CheckBox isArchivedView;
+        final WordsListPresenter presenter;
 
         EntryViewHolder(View view, WordsListPresenter presenter) {
             super(view);
             this.tvId = view.findViewById(R.id.tv_c_rcclr_view_words_id);
+            this.tvWeight = view.findViewById(R.id.tv_c_rcclr_view_words_weight);
             this.tvWord = view.findViewById(R.id.tv_c_rcclr_view_words_word);
             this.tvTranslation = view.findViewById(R.id.tv_c_rcclr_view_words_translation);
             this.isArchivedView = view.findViewById(R.id.is_archived);

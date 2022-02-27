@@ -37,9 +37,12 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     intent.extras?.getString(TITLE_EXTRA) ?: "?",
                     intent.extras?.getString(TEXT_EXTRA) ?: "?",
                     notificationId,
-                    withActions = false
+                    listOf(Known(context, wordId), Ok(context))
                 )
             )
+            ACTION.OK -> {
+                manager.cancel(notificationId)
+            }
         }
     }
 
@@ -67,20 +70,20 @@ class NotificationActionReceiver : BroadcastReceiver() {
             actionType: ACTION,
             notificationId: Int,
             wordId: Long? = null,
-            title: String? = null,
-            text: String? = null,
+            newNtfTitle: String? = null,
+            newNtfText: String? = null,
         ): Intent {
             return Intent(context, NotificationActionReceiver::class.java).apply {
                 putExtra(ACTION_EXTRA, actionType)
                 putExtra(NTF_ID_EXTRA, notificationId)
                 putExtra(WORD_ID_EXTRA, wordId)
-                putExtra(TITLE_EXTRA, title)
-                putExtra(TEXT_EXTRA, text)
+                putExtra(TITLE_EXTRA, newNtfTitle)
+                putExtra(TEXT_EXTRA, newNtfText)
             }
         }
     }
 }
 
 enum class ACTION {
-    SHOW, KNOWN
+    SHOW, KNOWN, OK
 }

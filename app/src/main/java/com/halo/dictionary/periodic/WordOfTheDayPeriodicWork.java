@@ -16,11 +16,13 @@ import com.halo.dictionary.repository.DictionaryRepositoryFactory;
 import com.halo.dictionary.repository.impl.PreferencesHelperImpl;
 
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Random;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -85,71 +87,32 @@ public class WordOfTheDayPeriodicWork extends Worker {
 
         int notificationId = NTF_ID + notificationOrderNumber;
 
-        manager.notify(notificationId, buildNotification(wordEntry, notificationId));
+        Notification notification = buildNotification(wordEntry, notificationId);
+        if (notification == null) {
+            Log.w(TAG, "Notification won't be send");
+            return;
+        }
+
+        manager.notify(notificationId, notification);
     }
 
+    @Nullable
     private Notification buildNotification(final WordEntryKt wordEntry, int notificationId) {
+        final Long id = wordEntry.getId();
+        if (id == null) {
+            Log.w(TAG, "Entry id is null");
+            return null;
+        }
+        final Context context = getApplicationContext();
         final boolean isReverseTranslateDirection = new Random().nextBoolean();
         final String word = isReverseTranslateDirection ? wordEntry.getTranslation() : wordEntry.getWord();
-//        final String text = isReverseTranslateDirection ? wordEntry.getWord() : wordEntry.getTranslation();
-        return new NotificationCompat.Builder(getApplicationContext(), NTF_CHANNEL)
-                .setContentText("What does it mean?")
-                .setContentTitle(word)
-                .setContentIntent(createIntent())
-                .setSmallIcon(R.drawable.button_add) // TODO icon
-                .extend(new NotificationCompat.WearableExtender()
-                        .addPage(createWearSecondPage(wordEntry, isReverseTranslateDirection))
-                )
-                .setAutoCancel(true)
-                .addAction(R.drawable.button_add, "Known", createHideNotificationIntent(notificationId, wordEntry))
-                .addAction(R.drawable.button_add, "Show", creteShowTranslationEvent(notificationId, wordEntry, isReverseTranslateDirection))
-                .build();
-    }
 
-    @NonNull
-    private PendingIntent createHideNotificationIntent(int notificationId,
-                                                       WordEntryKt wordEntry) {
-        return PendingIntent.getBroadcast(getApplicationContext(),
-                2,
-                NotificationActionReceiver.createIntent(
-                        getApplicationContext(),
-                        ACTION.KNOWN,
-                        notificationId,
-                        wordEntry.getId()),
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-    }
-
-    @NonNull
-    private PendingIntent creteShowTranslationEvent(int notificationId,
-                                                    WordEntryKt entry,
-                                                    boolean isReverseTranslation) {
-        return PendingIntent.getBroadcast(getApplicationContext(),
-                3,
-                NotificationActionReceiver.createIntent(
-                        getApplicationContext(),
-                        ACTION.SHOW,
-                        notificationId,
-                        entry.getId(),
-                        "The translation is",
-                        isReverseTranslation ? entry.getWord() : entry.getTranslation()),
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-    }
-
-
-    private PendingIntent createIntent() {
-        return PendingIntent.getActivity(
-                getApplicationContext(),
-                1,
-                new Intent(getApplicationContext(), MainActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-    }
-
-    private Notification createWearSecondPage(final WordEntryKt wordEntry,
-                                              final boolean isReverseTranslationDirection) {
-        return new NotificationCompat.Builder(getApplicationContext(), NTF_CHANNEL)
-                .setStyle(new NotificationCompat.BigTextStyle())
-                .setContentText(isReverseTranslationDirection ? wordEntry.getWord() : wordEntry.getTranslation())
-                .setAutoCancel(true)
-                .build();
+        return NotificationUtilsKt.buildNotification(
+                context,
+                "Do you know what is it?",
+                word,
+                notificationId,
+                Arrays.asList(new Known(context, id), new Show(context, wordEntry, isReverseTranslateDirection))
+        );
     }
 }

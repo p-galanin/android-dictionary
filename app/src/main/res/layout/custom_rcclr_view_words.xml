@@ -22,6 +22,15 @@
             android:layout_marginEnd="16dp"
             android:textSize="8dp" />
 
+        <TextView
+            android:id="@+id/tv_c_rcclr_view_words_weight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="weight"
+            android:layout_gravity="end"
+            android:layout_marginEnd="40dp"
+            android:textSize="8dp" />
 
         <TextView
             android:id="@+id/tv_c_rcclr_view_words_word"
