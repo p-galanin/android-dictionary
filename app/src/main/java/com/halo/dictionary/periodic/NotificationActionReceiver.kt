@@ -5,7 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.halo.dictionary.mvp.WordEntryKt
+import com.halo.dictionary.mvp.WordEntry
 import com.halo.dictionary.repository.impl.sql.WordDbHelper
 
 class NotificationActionReceiver : BroadcastReceiver() {
@@ -49,7 +49,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
     private fun updateWordWeight(context: Context, wordId: Long) {
         WordDbHelper.getInstance(context).getEntryById(wordId).ifPresent {
             WordDbHelper.getInstance(context).update(
-                WordEntryKt(it.word, it.translation, it.weight + 1, it.isArchived, it.id)
+                WordEntry(it.word, it.translation, it.weight + 1, it.isArchived, it.id)
             )
         }
     }

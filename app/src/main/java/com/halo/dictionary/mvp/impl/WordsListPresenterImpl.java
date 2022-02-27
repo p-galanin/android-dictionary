@@ -3,7 +3,7 @@ package com.halo.dictionary.mvp.impl;
 import android.content.Context;
 import android.net.Uri;
 
-import com.halo.dictionary.mvp.WordEntryKt;
+import com.halo.dictionary.mvp.WordEntry;
 import com.halo.dictionary.mvp.WordsListPresenter;
 import com.halo.dictionary.mvp.WordsListView;
 import com.halo.dictionary.mvp.base.Utils;
@@ -76,7 +76,7 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
-    public Optional<WordEntryKt> getEntryForPosition(final int position) {
+    public Optional<WordEntry> getEntryForPosition(final int position) {
         return getEntriesNavigator().getEntryByIndex(position);
     }
 
@@ -169,7 +169,7 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
-    public void onEntryChanged(@NonNull final WordEntryKt entry) {
+    public void onEntryChanged(@NonNull final WordEntry entry) {
         onEntriesListChanged(); // TODO refresh only changed item
         getView().executeOnUiThread(() -> getView().showMessage("Edited"));
     }
@@ -177,7 +177,7 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     @Override
     public void onArchiveClicked(@NonNull Long wordId) {
         this.repository.loadEntry(wordId).ifPresent(wordEntry -> {
-            WordEntryKt updatedEntry = new WordEntryKt(
+            WordEntry updatedEntry = new WordEntry(
                     wordEntry.getWord(),
                     wordEntry.getTranslation(),
                     wordEntry.getWeight(),

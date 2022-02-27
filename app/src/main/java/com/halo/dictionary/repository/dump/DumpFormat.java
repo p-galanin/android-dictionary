@@ -2,7 +2,7 @@ package com.halo.dictionary.repository.dump;
 
 import android.util.Log;
 
-import com.halo.dictionary.mvp.WordEntryKt;
+import com.halo.dictionary.mvp.WordEntry;
 
 import java.util.Optional;
 
@@ -17,14 +17,14 @@ public class DumpFormat {
     @VisibleForTesting
     static final String DEFAULT_TRANSLATION = "?";
 
-    public static Optional<WordEntryKt> parseEntry(@NonNull final String entryString) {
+    public static Optional<WordEntry> parseEntry(@NonNull final String entryString) {
         final String[] parts = entryString.split(SEPARATOR);
 
-        final WordEntryKt entry;
+        final WordEntry entry;
         if (isCorrectFormat(entryString, parts)) {
-            entry = new WordEntryKt(parts[0], parts[1], parseWeight(parts[2]), Boolean.parseBoolean(parts[3]));
+            entry = new WordEntry(parts[0], parts[1], parseWeight(parts[2]), Boolean.parseBoolean(parts[3]));
         } else if (isOldFormat(entryString, parts)) { // todo remove old format support
-            entry = new WordEntryKt(parts[0], parts.length > 1 ? parts[1] : DEFAULT_TRANSLATION, 0, false);
+            entry = new WordEntry(parts[0], parts.length > 1 ? parts[1] : DEFAULT_TRANSLATION, 0, false);
         } else {
 //            Log.w(TAG, "Incorrect format: " + entryString); todo log and units
             entry = null;

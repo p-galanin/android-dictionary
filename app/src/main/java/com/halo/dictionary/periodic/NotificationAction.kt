@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.halo.dictionary.R
-import com.halo.dictionary.mvp.WordEntryKt
+import com.halo.dictionary.mvp.WordEntry
 
 sealed class NotificationAction() {
     abstract fun addToNotificationBuilder(
@@ -49,7 +49,7 @@ data class Known(val context: Context, val wordId: Long) : NotificationAction() 
 
 data class Show(
     val context: Context,
-    val entry: WordEntryKt,
+    val entry: WordEntry,
     val isReverseTranslation: Boolean,
 ) : NotificationAction() {
 

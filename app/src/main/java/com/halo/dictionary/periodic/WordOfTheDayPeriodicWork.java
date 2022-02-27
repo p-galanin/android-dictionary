@@ -3,14 +3,10 @@ package com.halo.dictionary.periodic;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
-import com.halo.dictionary.R;
-import com.halo.dictionary.mvp.WordEntryKt;
-import com.halo.dictionary.mvp.ui.MainActivity;
+import com.halo.dictionary.mvp.WordEntry;
 import com.halo.dictionary.repository.DictionaryRepository;
 import com.halo.dictionary.repository.DictionaryRepositoryFactory;
 import com.halo.dictionary.repository.impl.PreferencesHelperImpl;
@@ -23,7 +19,6 @@ import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -57,7 +52,7 @@ public class WordOfTheDayPeriodicWork extends Worker {
                 final OptionalInt randomIndex = PeriodicWorkUtils.getNextRandomIndex(
                         navigator.getEntriesAmount(), new PreferencesHelperImpl(getApplicationContext()));
                 if (randomIndex.isPresent()) {
-                    final Optional<WordEntryKt> entryOpt = navigator.getEntryByIndex(randomIndex.getAsInt());
+                    final Optional<WordEntry> entryOpt = navigator.getEntryByIndex(randomIndex.getAsInt());
                     final int notificationOrderNumber = i;
                     entryOpt.ifPresent(entry -> sendWordNotification(entry, notificationOrderNumber));
                 }
@@ -67,7 +62,7 @@ public class WordOfTheDayPeriodicWork extends Worker {
         return Result.success();
     }
 
-    private void sendWordNotification(@NonNull final WordEntryKt wordEntry,
+    private void sendWordNotification(@NonNull final WordEntry wordEntry,
                                       final int notificationOrderNumber) {
 
         final NotificationManager manager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -97,7 +92,7 @@ public class WordOfTheDayPeriodicWork extends Worker {
     }
 
     @Nullable
-    private Notification buildNotification(final WordEntryKt wordEntry, int notificationId) {
+    private Notification buildNotification(final WordEntry wordEntry, int notificationId) {
         final Long id = wordEntry.getId();
         if (id == null) {
             Log.w(TAG, "Entry id is null");

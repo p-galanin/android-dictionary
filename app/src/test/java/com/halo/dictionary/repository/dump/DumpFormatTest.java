@@ -1,6 +1,6 @@
 package com.halo.dictionary.repository.dump;
 
-import com.halo.dictionary.mvp.WordEntryKt;
+import com.halo.dictionary.mvp.WordEntry;
 
 import org.junit.Test;
 
@@ -20,7 +20,7 @@ public class DumpFormatTest {
 
         final Map<String, String> source = new LinkedHashMap<>();
         final List<String> dumped = new ArrayList<>();
-        final Map<String, WordEntryKt> restored = new HashMap<>(source.size());
+        final Map<String, WordEntry> restored = new HashMap<>(source.size());
         final boolean isArchived = false;
         final int weight = 42;
 
@@ -39,7 +39,7 @@ public class DumpFormatTest {
 
         assertEquals(source.size(), restored.size());
         source.forEach((word, translation) -> {
-            WordEntryKt entry = restored.get(word);
+            WordEntry entry = restored.get(word);
             assertNotNull(entry);
             assertEquals(translation.isEmpty() ? DEFAULT_TRANSLATION : translation, entry.getTranslation());
             assertEquals(isArchived, entry.isArchived());

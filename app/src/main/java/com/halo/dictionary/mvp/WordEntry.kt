@@ -1,6 +1,6 @@
 package com.halo.dictionary.mvp
 
-data class WordEntryKt @JvmOverloads constructor(
+data class WordEntry @JvmOverloads constructor(
     val word: String,
     val translation: String,
     val weight: Int = 0,

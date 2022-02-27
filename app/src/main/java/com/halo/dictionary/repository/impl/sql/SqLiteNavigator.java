@@ -2,7 +2,7 @@ package com.halo.dictionary.repository.impl.sql;
 
 import android.database.Cursor;
 
-import com.halo.dictionary.mvp.WordEntryKt;
+import com.halo.dictionary.mvp.WordEntry;
 import com.halo.dictionary.repository.DictionaryRepository;
 
 import java.util.Optional;
@@ -29,7 +29,7 @@ public class SqLiteNavigator implements DictionaryRepository.Navigator {
     }
 
     @Override
-    public Optional<WordEntryKt> getEntryByIndex(final int index) {
+    public Optional<WordEntry> getEntryByIndex(final int index) {
         if (!this.cursor.moveToPosition(index)) {
             return Optional.empty();
         }
@@ -40,7 +40,7 @@ public class SqLiteNavigator implements DictionaryRepository.Navigator {
         final boolean isArchived = this.cursor.getInt(this.cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_IS_ARCHIVED)) == 1;
         final int weight = this.cursor.getInt(this.cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_WEIGHT));
         // todo one time from db
-        return Optional.of(new WordEntryKt(word, translation, weight, isArchived, id));
+        return Optional.of(new WordEntry(word, translation, weight, isArchived, id));
     }
 
     @Override

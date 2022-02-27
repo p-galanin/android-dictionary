@@ -2,7 +2,7 @@ package com.halo.dictionary.mvp.impl;
 
 import com.halo.dictionary.mvp.EditEntryPresenter;
 import com.halo.dictionary.mvp.EditEntryView;
-import com.halo.dictionary.mvp.WordEntryKt;
+import com.halo.dictionary.mvp.WordEntry;
 import com.halo.dictionary.repository.DictionaryRepository;
 import com.halo.dictionary.repository.DictionaryRepositoryFactory;
 
@@ -14,7 +14,7 @@ public class EditEntryPresenterImpl implements EditEntryPresenter {
     private EditEntryView view;
     private DictionaryRepository repository;
     @Nullable
-    private WordEntryKt currentEntry;
+    private WordEntry currentEntry;
     
     public EditEntryPresenterImpl(@NonNull final EditEntryView view) {
         attachView(view);
@@ -33,7 +33,7 @@ public class EditEntryPresenterImpl implements EditEntryPresenter {
     @Override
     public void onSaveButtonClicked() {
         this.repository.updateEntry(
-                new WordEntryKt(
+                new WordEntry(
                         getView().getWordText(),
                         getView().getTranslationText(),
                         currentEntry == null ? 0 : currentEntry.getWeight(),

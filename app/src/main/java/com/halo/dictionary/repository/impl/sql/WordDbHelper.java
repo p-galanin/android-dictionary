@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.halo.dictionary.mvp.WordEntryKt;
+import com.halo.dictionary.mvp.WordEntry;
 
 import java.util.Optional;
 
@@ -63,7 +63,7 @@ public class WordDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_CREATE_WORDS_TABLE);
     }
 
-    public boolean update(@NonNull final WordEntryKt wordEntry) {
+    public boolean update(@NonNull final WordEntry wordEntry) {
 
         final ContentValues values = new ContentValues();
         values.put(WordContract.Entry.COLUMN_NAME_WORD, wordEntry.getWord());
@@ -144,7 +144,7 @@ public class WordDbHelper extends SQLiteOpenHelper {
      * @param word word value, not null
      * @return first found word entry with such word value or empty object, if there is no entries with such value
      */
-    Optional<WordEntryKt> getWordEntryByWord(@NonNull final String word) {
+    Optional<WordEntry> getWordEntryByWord(@NonNull final String word) {
         return findFirstEntry(WordContract.Entry.COLUMN_NAME_WORD + "=?", new String[]{word});
     }
 
@@ -154,7 +154,7 @@ public class WordDbHelper extends SQLiteOpenHelper {
      * @param id entry id, not null
      * @return word entry with such id or empty object, if there is no one
      */
-    public Optional<WordEntryKt> getEntryById(@NonNull final Long id) {
+    public Optional<WordEntry> getEntryById(@NonNull final Long id) {
         return findFirstEntry(WordContract.Entry._ID + "=?", new String[]{id.toString()});
     }
 
@@ -165,13 +165,13 @@ public class WordDbHelper extends SQLiteOpenHelper {
      * @return созданную запись или {@code null}, если запись не была создана
      */
     @Nullable
-    public WordEntryKt saveWordEntry(@NonNull WordEntryKt wordEntry) {
-        WordEntryKt result = null;
+    public WordEntry saveWordEntry(@NonNull WordEntry wordEntry) {
+        WordEntry result = null;
 
         final SQLiteDatabase dbWordsWr = getWritableDatabase();
         long id = insertWordEntry(wordEntry, dbWordsWr);
         if (id > 0) {
-            result = new WordEntryKt(
+            result = new WordEntry(
                     wordEntry.getWord(),
                     wordEntry.getTranslation(),
                     wordEntry.getWeight(), wordEntry.isArchived(), id
@@ -198,7 +198,7 @@ public class WordDbHelper extends SQLiteOpenHelper {
      * @return ID добавленной записи в таблице или -1, если запись не была добавлена
      */
     private long insertWordEntry(
-            @NonNull WordEntryKt entry,
+            @NonNull WordEntry entry,
             @NonNull SQLiteDatabase dbWordsWr) {
 
         ContentValues values = new ContentValues();
@@ -212,8 +212,8 @@ public class WordDbHelper extends SQLiteOpenHelper {
         return dbWordsWr.insert(WordContract.Entry.TABLE_NAME, null, values);
     }
 
-    private Optional<WordEntryKt> findFirstEntry(final String selection,
-                                                 final String[] selectionArgs) {
+    private Optional<WordEntry> findFirstEntry(final String selection,
+                                               final String[] selectionArgs) {
         final String[] columns = {
                 WordContract.Entry.COLUMN_NAME_WORD,
                 WordContract.Entry.COLUMN_NAME_TRANSLATION,
@@ -238,9 +238,9 @@ public class WordDbHelper extends SQLiteOpenHelper {
         }
     }
 
-    private WordEntryKt composeWordEntryByCursor(@NonNull final Cursor cursor) {
+    private WordEntry composeWordEntryByCursor(@NonNull final Cursor cursor) {
         // todo one time from db
-        return new WordEntryKt(
+        return new WordEntry(
                 cursor.getString(cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_WORD)),
                 cursor.getString(cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_TRANSLATION)),
                 cursor.getInt(cursor.getColumnIndex(WordContract.Entry.COLUMN_NAME_WEIGHT)),
