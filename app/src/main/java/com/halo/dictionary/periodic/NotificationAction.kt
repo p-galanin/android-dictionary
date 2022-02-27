@@ -7,7 +7,9 @@ import androidx.core.app.NotificationCompat
 import com.halo.dictionary.R
 import com.halo.dictionary.mvp.WordEntry
 
-sealed class NotificationAction() {
+sealed class NotificationAction {
+    protected abstract val requestCode: Int
+
     abstract fun addToNotificationBuilder(
         notificationId: Int,
         builder: NotificationCompat.Builder,
@@ -17,17 +19,15 @@ sealed class NotificationAction() {
     protected fun createPendingIntent(intent: Intent, context: Context): PendingIntent =
         PendingIntent.getBroadcast(
             context,
-            REQUEST_CODE,
+            requestCode,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
-    companion object {
-        private const val REQUEST_CODE = 1
-    }
 }
 
 data class Known(val context: Context, val wordId: Long) : NotificationAction() {
+    override val requestCode = 1
+
     override fun addToNotificationBuilder(
         notificationId: Int,
         builder: NotificationCompat.Builder,
@@ -52,6 +52,7 @@ data class Show(
     val entry: WordEntry,
     val isReverseTranslation: Boolean,
 ) : NotificationAction() {
+    override val requestCode = 2
 
     override fun addToNotificationBuilder(
         notificationId: Int,
@@ -75,6 +76,8 @@ data class Show(
 }
 
 data class Ok(val context: Context) : NotificationAction() {
+    override val requestCode = 3
+
     override fun addToNotificationBuilder(
         notificationId: Int,
         builder: NotificationCompat.Builder,
