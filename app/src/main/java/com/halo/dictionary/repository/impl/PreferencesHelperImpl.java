@@ -25,7 +25,7 @@ public class PreferencesHelperImpl implements PreferencesHelper {
         final int currentBlock = preferences.getInt(BLOCK_NUMBER_KEY, 0);
 
         final SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(BLOCK_NUMBER_KEY, currentBlock == blocksAmount ? 0 : currentBlock + 1);
+        editor.putInt(BLOCK_NUMBER_KEY, currentBlock >= blocksAmount ? 0 : currentBlock + 1);
         editor.apply();
 
         return currentBlock;

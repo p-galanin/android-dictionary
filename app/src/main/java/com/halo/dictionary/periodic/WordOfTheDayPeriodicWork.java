@@ -54,6 +54,9 @@ public class WordOfTheDayPeriodicWork extends Worker {
                 if (randomIndex.isPresent()) {
                     final Optional<WordEntry> entryOpt = navigator.getEntryByIndex(randomIndex.getAsInt());
                     final int notificationOrderNumber = i;
+                    if (!entryOpt.isPresent()) {
+                        Log.e(TAG, "Entry for index " + randomIndex.getAsInt() + " not found");
+                    }
                     entryOpt.ifPresent(entry -> sendWordNotification(entry, notificationOrderNumber));
                 }
             }

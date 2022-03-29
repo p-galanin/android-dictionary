@@ -81,7 +81,7 @@ public class PeriodicWorkUtils {
 
         final int currentBlockNumber = preferencesHelper.updateBlockNumber(blocksAmount);
         final int result = currentBlockNumber * blockSize + randomGenerator.nextInt(
-                currentBlockNumber == blocksAmount - 1 ? (blockSize + overallAmount % blockSize) : blockSize);
+                (currentBlockNumber == blocksAmount - 1) ? (blockSize + overallAmount % blockSize) : blockSize);
 
         return OptionalInt.of(result);
     }
