@@ -78,11 +78,19 @@ public class PeriodicWorkUtils {
         }
 
         int blocksAmount = overallAmount / blockSize;
+        if (overallAmount % blockSize != 0) {
+            blocksAmount++;
+        }
 
-        final int currentBlockNumber = preferencesHelper.updateBlockNumber(blocksAmount);
-        final int result = currentBlockNumber * blockSize + randomGenerator.nextInt(
-                (currentBlockNumber == blocksAmount - 1) ? (blockSize + overallAmount % blockSize) : blockSize);
-
+        final int newBlockNumber = preferencesHelper.updateBlockNumber(blocksAmount);
+        final int maxIndex = (newBlockNumber == blocksAmount - 1) ? (overallAmount % blockSize) : blockSize;
+        int index;
+        if (maxIndex == 0) {
+            index = 0;
+        } else {
+            index = randomGenerator.nextInt(maxIndex);
+        }
+        int result = newBlockNumber * blockSize + index;
         return OptionalInt.of(result);
     }
 

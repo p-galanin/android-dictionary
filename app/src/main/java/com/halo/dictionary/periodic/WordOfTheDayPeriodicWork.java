@@ -9,6 +9,7 @@ import android.util.Log;
 import com.halo.dictionary.mvp.WordEntry;
 import com.halo.dictionary.repository.DictionaryRepository;
 import com.halo.dictionary.repository.DictionaryRepositoryFactory;
+import com.halo.dictionary.repository.impl.PreferenceStorageImpl;
 import com.halo.dictionary.repository.impl.PreferencesHelperImpl;
 
 import java.time.LocalTime;
@@ -50,7 +51,7 @@ public class WordOfTheDayPeriodicWork extends Worker {
         if (navigator.getEntriesAmount() > 0 && !PeriodicWorkUtils.userMightBeSleeping(LocalTime.now())) {
             for (int i = 0; i < AMOUNT_OF_NTF; i++) {
                 final OptionalInt randomIndex = PeriodicWorkUtils.getNextRandomIndex(
-                        navigator.getEntriesAmount(), new PreferencesHelperImpl(getApplicationContext()));
+                        navigator.getEntriesAmount(), new PreferencesHelperImpl(new PreferenceStorageImpl(getApplicationContext())));
                 if (randomIndex.isPresent()) {
                     final Optional<WordEntry> entryOpt = navigator.getEntryByIndex(randomIndex.getAsInt());
                     final int notificationOrderNumber = i;

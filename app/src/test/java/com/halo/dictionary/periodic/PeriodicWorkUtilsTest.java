@@ -1,13 +1,18 @@
 package com.halo.dictionary.periodic;
 
 import com.halo.dictionary.repository.PreferencesHelper;
+import com.halo.dictionary.repository.impl.PreferenceStorage;
+import com.halo.dictionary.repository.impl.PreferencesHelperImpl;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
 
 import static com.halo.dictionary.periodic.PeriodicWorkUtils.BLOCK_SIZE;
@@ -27,22 +32,23 @@ public class PeriodicWorkUtilsTest {
         assertEquals(PeriodicWorkUtils.computeInitialDelay(currentTimeAfter), Duration.ofHours(23).plus(Duration.ofMinutes(59)));
     }
 
-    private final PreferencesHelper testPrefHelper = new PreferencesHelper() {
-
-        int nextBlockNumber;
+    private static class TestPreferenceStorage implements PreferenceStorage {
+        private final Map<String, Integer> values = new HashMap<>();
 
         @Override
-        public int updateBlockNumber(final int blocksAmount) {
-            final int currentNumber = this.nextBlockNumber;
-            this.nextBlockNumber = currentNumber == blocksAmount - 1 ? 0 : currentNumber + 1;
-            return currentNumber;
+        public void saveInt(@NotNull String key, int value) {
+            values.put(key, value);
         }
 
         @Override
-        public void dropBlockNumber() {
-            this.nextBlockNumber = 0;
+        public int getInt(@NotNull String key, int defaultValue) {
+            return values.getOrDefault(key, defaultValue);
         }
-    };
+    }
+
+    ;
+
+    private final PreferencesHelper testPrefHelper = new PreferencesHelperImpl(new TestPreferenceStorage());
 
     @Test
     public void testGetNextRandomIndex() {
@@ -50,8 +56,8 @@ public class PeriodicWorkUtilsTest {
         assertEquals(OptionalInt.empty(), PeriodicWorkUtils.getNextRandomIndex(0, this.testPrefHelper));
 
         final List<Integer> overallAmountCases = Arrays.asList(
-                Math.max(THRESHOLD_FOR_BLOCK_SIZE - 1, 1),
-                THRESHOLD_FOR_BLOCK_SIZE + 1,
+//                Math.max(THRESHOLD_FOR_BLOCK_SIZE - 1, 1),
+//                THRESHOLD_FOR_BLOCK_SIZE + 1,
                 THRESHOLD_FOR_BLOCK_SIZE * 2);
 
         overallAmountCases.forEach(overallAmount -> {
@@ -63,7 +69,14 @@ public class PeriodicWorkUtilsTest {
     private void checkBlockSizeIteration(final int overallAmount) {
 
         final int actualBlockSize = overallAmount < THRESHOLD_FOR_BLOCK_SIZE ? BLOCK_SIZE / 2 : BLOCK_SIZE;
-        final int blocksAmount = overallAmount / actualBlockSize;
+        int blocksAmount = overallAmount / actualBlockSize;
+        if (overallAmount % actualBlockSize != 0) {
+            blocksAmount++;
+        }
+
+        System.out.println("Start check: overallAmount=" + overallAmount
+                + ", actualBlockSize=" + actualBlockSize
+                + "; blocksAmount=" + blocksAmount);
 
         for (int i = 0; i < blocksAmount; i++) {
 
@@ -72,21 +85,13 @@ public class PeriodicWorkUtilsTest {
             System.out.println(nextIndex);
 
             assertTrue(nextIndex.isPresent());
-            assertTrue(nextIndex.getAsInt() >= actualBlockSize * i);
-
             if (i == blocksAmount - 1) {
-                assertTrue(nextIndex.getAsInt() >= actualBlockSize * i);
+                assertTrue(nextIndex.getAsInt() < actualBlockSize);
             } else {
-                assertTrue(nextIndex.getAsInt() < overallAmount);
+                assertTrue(nextIndex.getAsInt() <= overallAmount);
+                assertTrue(nextIndex.getAsInt() >= actualBlockSize * i);
             }
-
         }
-
-        // Check returning to the first block (with index 0)
-        final OptionalInt overflowIndex = PeriodicWorkUtils.getNextRandomIndex(overallAmount, this.testPrefHelper);
-        assertTrue(overflowIndex.isPresent());
-        assertTrue(overflowIndex.getAsInt() >= 0);
-        assertTrue(overflowIndex.getAsInt() < actualBlockSize);
     }
 
 }
