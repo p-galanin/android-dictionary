@@ -1,7 +1,7 @@
 package com.halo.dictionary.periodic;
 
 import com.halo.dictionary.repository.PreferencesHelper;
-import com.halo.dictionary.repository.impl.PreferenceStorage;
+import com.halo.dictionary.repository.impl.PreferencesStorage;
 import com.halo.dictionary.repository.impl.PreferencesHelperImpl;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ public class PeriodicWorkUtilsTest {
         assertEquals(PeriodicWorkUtils.computeInitialDelay(currentTimeAfter), Duration.ofHours(23).plus(Duration.ofMinutes(59)));
     }
 
-    private static class TestPreferenceStorage implements PreferenceStorage {
+    private static class TestPreferenceStorage implements PreferencesStorage {
         private final Map<String, Integer> values = new HashMap<>();
 
         @Override

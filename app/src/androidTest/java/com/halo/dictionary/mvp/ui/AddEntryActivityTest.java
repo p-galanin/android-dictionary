@@ -1,42 +1,57 @@
 package com.halo.dictionary.mvp.ui;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.widget.TextView;
-
 import com.halo.dictionary.R;
+import com.halo.dictionary.periodic.PreferencesModule;
+import com.halo.dictionary.repository.impl.PreferencesStorage;
 
+import org.jetbrains.annotations.NotNull;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
 
-import androidx.test.core.app.ApplicationProvider;
-import androidx.test.espresso.Espresso;
-import androidx.test.espresso.ViewAction;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.matcher.ViewMatchers;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
 import androidx.test.filters.SmallTest;
 import androidx.test.rule.ActivityTestRule;
+import dagger.Module;
+import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.testing.HiltAndroidRule;
+import dagger.hilt.android.testing.HiltAndroidTest;
+import dagger.hilt.android.testing.UninstallModules;
+import dagger.hilt.components.SingletonComponent;
 
-import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
+import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.junit.Assert.assertEquals;
-import static androidx.test.espresso.Espresso.*;
-import static androidx.test.espresso.action.ViewActions.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@SmallTest
-@RunWith(AndroidJUnit4.class)
+@LargeTest
+@UninstallModules(PreferencesModule.class)
+@HiltAndroidTest
 public class AddEntryActivityTest {
 
     @Rule
     public ActivityTestRule<AddEntryActivity> activityRule = new ActivityTestRule<>(AddEntryActivity.class);
+
+    @Rule
+    public HiltAndroidRule hiltRule = new HiltAndroidRule(this);
+
+    @Inject
+    PreferencesStorage preferencesStorage;
+
+    @Before
+    public void init() {
+        hiltRule.inject();
+    }
 
     @Test
     public void testActivityUi() {
@@ -58,5 +73,29 @@ public class AddEntryActivityTest {
                 .perform(ViewActions.click());
 
         assertTrue(this.activityRule.getActivity().isFinishing() || this.activityRule.getActivity().isDestroyed());
+    }
+
+    @Module
+    @InstallIn(SingletonComponent.class)
+    public static class FakePreferencesModule {
+
+        @Provides
+        @Singleton
+        PreferencesStorage providePreferencesStorage() {
+            return new PreferencesStorage() {
+                private final Map<String, Integer> storage = new HashMap<>();
+
+                @Override
+                public void saveInt(@NotNull String key, int value) {
+                    storage.put(key, value);
+                }
+
+                @Override
+                public int getInt(@NotNull String key, int defaultValue) {
+                    Integer value = storage.get(key);
+                    return value == null ? defaultValue : value;
+                }
+            };
+        }
     }
 }

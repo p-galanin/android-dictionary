@@ -10,18 +10,25 @@ import android.widget.Toast;
 import com.halo.dictionary.R;
 import com.halo.dictionary.mvp.AddEntryPresenter;
 import com.halo.dictionary.mvp.AddEntryView;
-import com.halo.dictionary.mvp.impl.AddEntryPresenterImpl;
 
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class AddEntryActivity extends AppCompatActivity implements AddEntryView {
 
-    private AddEntryPresenter presenter;
+    @Inject
+    AddEntryPresenter presenter;
+
     private EditText tvWord;
+
     private EditText tvTranslation;
+
     private Button buttonSave;
 
     private static final String TAG = "AddEntryActivity";
@@ -30,8 +37,6 @@ public class AddEntryActivity extends AppCompatActivity implements AddEntryView 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_word);
-
-        this.presenter = new AddEntryPresenterImpl(this);
 
         this.tvWord = findViewById(R.id.tvWord);
         this.tvTranslation = findViewById(R.id.tvTranslation);

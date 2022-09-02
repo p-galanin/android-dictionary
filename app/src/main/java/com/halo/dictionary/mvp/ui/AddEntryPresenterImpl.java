@@ -1,23 +1,25 @@
-package com.halo.dictionary.mvp.impl;
+package com.halo.dictionary.mvp.ui;
 
 import com.halo.dictionary.mvp.AddEntryPresenter;
 import com.halo.dictionary.mvp.AddEntryView;
 import com.halo.dictionary.repository.DictionaryRepository;
-import com.halo.dictionary.repository.DictionaryRepositoryFactory;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import dagger.hilt.android.scopes.ActivityScoped;
 
+@ActivityScoped
 public class AddEntryPresenterImpl implements AddEntryPresenter {
 
     private AddEntryView view;
-    private DictionaryRepository repository;
+    private final DictionaryRepository repository;
 
-    public AddEntryPresenterImpl(@NonNull final AddEntryView view) {
-        attachView(view);
-        this.repository = DictionaryRepositoryFactory.createDictionaryRepository(getView());
-    }
-
-    AddEntryPresenterImpl(@NonNull final AddEntryView view, @NonNull DictionaryRepository repository) {
+    @Inject
+    public AddEntryPresenterImpl(
+            @NonNull final AddEntryView view,
+            @NonNull DictionaryRepository repository
+    ) {
         attachView(view);
         this.repository = repository;
     }

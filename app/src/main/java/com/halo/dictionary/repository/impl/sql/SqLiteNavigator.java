@@ -7,20 +7,20 @@ import com.halo.dictionary.repository.DictionaryRepository;
 
 import java.util.Optional;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import androidx.annotation.NonNull;
 
 public class SqLiteNavigator implements DictionaryRepository.Navigator {
 
+    private final Provider<Cursor> cursorProvider;
     private Cursor cursor;
-    final private SqLiteDictionaryRepository repository;
 
-    SqLiteNavigator(@NonNull final SqLiteDictionaryRepository repository, boolean withArchived) {
-        this.repository = repository;
-        if (withArchived) {
-            this.cursor = this.repository.getAllEntriesCursor();
-        } else {
-            this.cursor = this.repository.getNotArchivedEntriesCursor();
-        }
+    @Inject
+    SqLiteNavigator(@NonNull final Provider<Cursor> cursorProvider) {
+        this.cursorProvider = cursorProvider;
+        this.cursor = cursorProvider.get();
     }
 
     @Override
@@ -48,7 +48,6 @@ public class SqLiteNavigator implements DictionaryRepository.Navigator {
         if (this.cursor != null) {
             this.cursor.close();
         }
-        this.cursor = this.repository.getAllEntriesCursor();
+        this.cursor = this.cursorProvider.get();
     }
-
 }

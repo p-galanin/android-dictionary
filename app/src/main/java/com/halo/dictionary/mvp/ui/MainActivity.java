@@ -27,8 +27,9 @@ import com.halo.dictionary.R;
 import com.halo.dictionary.mvp.WordsListPresenter;
 import com.halo.dictionary.mvp.WordsListView;
 import com.halo.dictionary.mvp.base.Utils;
-import com.halo.dictionary.mvp.impl.WordsListPresenterImpl;
 import com.halo.dictionary.mvp.ui.rcclrview.WordsRcclrViewAdapter;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,11 +38,15 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity implements WordsListView {
 
+    @Inject
+    WordsListPresenter presenter;
+
     private RecyclerView.Adapter rcclrViewAdapter;
-    private WordsListPresenter presenter;
     private ProgressBar progressBar;
 
     private static final String TAG = "MainActivity";
@@ -54,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.presenter = new WordsListPresenterImpl(this);
         init();
         this.presenter.onViewInitialized();
     }

@@ -7,8 +7,16 @@ import android.content.Intent
 import android.util.Log
 import com.halo.dictionary.mvp.WordEntry
 import com.halo.dictionary.repository.impl.sql.WordDbHelper
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NotificationActionReceiver : BroadcastReceiver() {
+
+    @Inject
+    lateinit var wordDbHelper: WordDbHelper
+    @Inject
+    lateinit var notificationManager: NotificationManager
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.i(TAG, "Broadcast received, extras: ${intent.extras}")
@@ -21,16 +29,12 @@ class NotificationActionReceiver : BroadcastReceiver() {
             return
         }
 
-        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE)
-            as? NotificationManager
-            ?: return
-
         when (action) {
             ACTION.KNOWN -> {
-                manager.cancel(notificationId)
-                updateWordWeight(context, wordId)
+                notificationManager.cancel(notificationId)
+                updateWordWeight(wordId)
             }
-            ACTION.SHOW -> manager.notify(
+            ACTION.SHOW -> notificationManager.notify(
                 notificationId,
                 buildNotification(
                     context,
@@ -41,14 +45,14 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 )
             )
             ACTION.OK -> {
-                manager.cancel(notificationId)
+                notificationManager.cancel(notificationId)
             }
         }
     }
 
-    private fun updateWordWeight(context: Context, wordId: Long) {
-        WordDbHelper.getInstance(context).getEntryById(wordId).ifPresent {
-            WordDbHelper.getInstance(context).update(
+    private fun updateWordWeight(wordId: Long) {
+        this.wordDbHelper.getEntryById(wordId).ifPresent {
+            this.wordDbHelper.update(
                 WordEntry(it.word, it.translation, it.weight + 1, it.isArchived, it.id)
             )
         }

@@ -1,6 +1,5 @@
 package com.halo.dictionary.repository.impl.sql;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -23,32 +22,23 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.NonNull;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import androidx.annotation.NonNull;
+import dagger.hilt.InstallIn;
+import dagger.hilt.components.SingletonComponent;
+
+@Singleton
 public class SqLiteDictionaryRepository implements DictionaryRepository {
 
     private static final String TAG = "SqLiteRepository";
-
-    private static SqLiteDictionaryRepository INSTANCE;
-    private Set<Listener> listeners;
+    private final Set<Listener> listeners;
     private WordDbHelper dbHelper;
 
-    @NonNull
-    public static SqLiteDictionaryRepository getInstance(@NonNull final Context context) {
-        SqLiteDictionaryRepository instance = INSTANCE;
-        if (instance == null) {
-            synchronized (SqLiteDictionaryRepository.class) {
-                if (INSTANCE == null) {
-                    instance = new SqLiteDictionaryRepository(context);
-                    INSTANCE = instance;
-                }
-            }
-        }
-        return INSTANCE;
-    }
-
-    private SqLiteDictionaryRepository(@NonNull final Context context) {
-        this.dbHelper = WordDbHelper.getInstance(context);
+    @Inject
+    public SqLiteDictionaryRepository(WordDbHelper wordDbHelper) {
+        this.dbHelper = wordDbHelper;
         this.listeners = new LinkedHashSet<>();   
     }
 
@@ -83,12 +73,6 @@ public class SqLiteDictionaryRepository implements DictionaryRepository {
     @Override
     public Optional<WordEntry> loadEntry(@NonNull final Long entryId) {
         return this.dbHelper.getEntryById(entryId);
-    }
-
-    @NonNull
-    @Override
-    public Navigator createNavigator(boolean withArchived) {
-        return new SqLiteNavigator(this, withArchived);
     }
 
     @Override

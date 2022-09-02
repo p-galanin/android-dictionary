@@ -58,13 +58,6 @@ public interface DictionaryRepository {
     Optional<WordEntry> loadEntry(@NonNull final Long id);
 
     /**
-     * Creates an instance of entries navigator, connected to this repository.
-     * @return created navigator, not null
-     */
-    @NonNull
-    Navigator createNavigator(boolean withArchived);
-
-    /**
      * Deletes an entry with specified ID.
      * @param id entry ID to delete
      */

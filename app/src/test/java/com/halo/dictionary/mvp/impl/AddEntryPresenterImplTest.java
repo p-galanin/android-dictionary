@@ -2,6 +2,7 @@ package com.halo.dictionary.mvp.impl;
 
 import com.halo.dictionary.mvp.AddEntryPresenter;
 import com.halo.dictionary.mvp.AddEntryView;
+import com.halo.dictionary.mvp.ui.AddEntryPresenterImpl;
 import com.halo.dictionary.repository.DictionaryRepository;
 
 import org.junit.Test;
@@ -18,10 +19,18 @@ import static org.mockito.Mockito.verify;
 
 public class AddEntryPresenterImplTest {
 
+    private AddEntryPresenter createPresenter() {
+        return createPresenter(mock(AddEntryView.class));
+    }
+
+    private AddEntryPresenter createPresenter(AddEntryView view) {
+        return new AddEntryPresenterImpl(view, mock(DictionaryRepository.class));
+    }
+
     @Test
     public void testValidateInput() {
 
-        final AddEntryPresenter presenter = new AddEntryPresenterImpl(mock(AddEntryView.class));
+        final AddEntryPresenter presenter = createPresenter();
 
         assertTrue(presenter.validateInput("correct", "корректный"));
         verify(presenter.getView(), times(0)).showMessage(Mockito.anyString());
@@ -39,19 +48,19 @@ public class AddEntryPresenterImplTest {
 
     @Test(expected = IllegalStateException.class)
     public void testDetachView() {
-        final AddEntryPresenter presenter = new AddEntryPresenterImpl(mock(AddEntryView.class));
+        final AddEntryPresenter presenter = createPresenter();
         presenter.detachView();
         presenter.getView();
     }
 
     @Test
     public void testAttachView() {
-        final AddEntryPresenter presenter = new AddEntryPresenterImpl(mock(AddEntryView.class));
+        final AddEntryPresenter presenter = createPresenter();
         final AddEntryView view = Mockito.mock(AddEntryView.class);
         presenter.attachView(view);
         assertEquals(view, presenter.getView());
 
-        final AddEntryPresenter otherPresenter = new AddEntryPresenterImpl(view);
+        final AddEntryPresenter otherPresenter = createPresenter(view);
         assertEquals(view, otherPresenter.getView());
     }
 

@@ -11,41 +11,30 @@ import com.halo.dictionary.mvp.WordEntry;
 
 import java.util.Optional;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.qualifiers.ApplicationContext;
+import dagger.hilt.components.SingletonComponent;
 
 /**
  * Класс для управления обменом данными с БД
  * <p>
  * Created by halo on 17.09.2017.
  */
-
+@Singleton
 public class WordDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "words.db";
     private static final String TAG = WordDbHelper.class.getSimpleName();
-
-    private static WordDbHelper INSTANCE;
-
     private static final int DATABASE_VERSION = 2;
 
-    private WordDbHelper(Context context) {
+    @Inject
+    public WordDbHelper(@ApplicationContext Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-
-    /**
-     * Получить экземпляр {@link WordDbHelper} или создать новый, если экземпляр ещё не создан.
-     *
-     * @param context - контекст, с которым будет создан экземпляр, если до этого ещё не создан
-     * @return {@link WordDbHelper}
-     */
-    @NonNull
-    public static synchronized WordDbHelper getInstance(@NonNull Context context) {
-        if (INSTANCE == null) {
-            INSTANCE = new WordDbHelper(context);
-        }
-        return INSTANCE;
     }
 
     @Override

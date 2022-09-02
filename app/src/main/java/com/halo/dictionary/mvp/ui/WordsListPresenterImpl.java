@@ -1,4 +1,4 @@
-package com.halo.dictionary.mvp.impl;
+package com.halo.dictionary.mvp.ui;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,7 +9,6 @@ import com.halo.dictionary.mvp.WordsListView;
 import com.halo.dictionary.mvp.base.Utils;
 import com.halo.dictionary.periodic.PeriodicWorkUtils;
 import com.halo.dictionary.repository.DictionaryRepository;
-import com.halo.dictionary.repository.DictionaryRepositoryFactory;
 import com.halo.dictionary.repository.dump.DumpCallback;
 import com.halo.dictionary.repository.dump.RestoreFromDumpCallback;
 
@@ -17,21 +16,36 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import androidx.annotation.NonNull;
+import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.work.WorkManager;
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.components.ActivityComponent;
+import dagger.hilt.android.scopes.ActivityScoped;
+
+@ActivityScoped
 public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRepository.Listener {
 
     private WordsListView view;
-    final private DictionaryRepository repository;
-    final private DictionaryRepository.Navigator navigator;
+    private final DictionaryRepository repository;
+    private final DictionaryRepository.Navigator navigator;
+    private final WorkManager workManger;
 
     private final Set<Long> invisibleTranslations = new HashSet<>();
 
-    public WordsListPresenterImpl(@NonNull final WordsListView view) {
+    @Inject
+    public WordsListPresenterImpl(
+            @NonNull WordsListView view,
+            @NonNull DictionaryRepository repository,
+            @NonNull DictionaryRepository.Navigator navigator,
+            @NonNull WorkManager workManager
+    ) {
         attachView(view);
-        this.repository = DictionaryRepositoryFactory.createDictionaryRepository(getView());
-        this.navigator = this.repository.createNavigator(true);
+        this.repository = repository;
+        this.navigator = navigator;
         this.repository.registerListener(this);
+        this.workManger = workManager;
     }
 
     @Override
@@ -44,7 +58,7 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
 
     @Override
     public void onViewInitialized() {
-        PeriodicWorkUtils.startWordOfTheDayNotifications(getView());
+        PeriodicWorkUtils.startWordOfTheDayNotifications(workManger);
     }
 
     @Override
@@ -72,7 +86,6 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
         if (!this.invisibleTranslations.remove(entryId)) {
             this.invisibleTranslations.add(entryId);
         }
-
     }
 
     @Override
@@ -152,7 +165,6 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
 
     @Override
     public void detachView() {
-        this.view = null;
         this.repository.unregisterListener(this);
     }
 

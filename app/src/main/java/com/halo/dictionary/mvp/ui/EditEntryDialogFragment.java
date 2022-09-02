@@ -10,21 +10,24 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.halo.dictionary.R;
-import com.halo.dictionary.mvp.EditEntryPresenter;
 import com.halo.dictionary.mvp.EditEntryView;
-import com.halo.dictionary.mvp.impl.EditEntryPresenterImpl;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class EditEntryDialogFragment extends DialogFragment implements EditEntryView {
 
     static final String ID_KEY = "processingId";
 
     private Long processingId;
 
-    private EditEntryPresenter presenter;
+    @Inject
+    EditEntryPresenterImpl presenter;
 
     private EditText wordView;
     private EditText translationView;
@@ -38,8 +41,6 @@ public class EditEntryDialogFragment extends DialogFragment implements EditEntry
         } else {
             this.processingId = getArguments().getLong(ID_KEY);
         }
-
-        this.presenter = new EditEntryPresenterImpl(this);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = requireActivity().getLayoutInflater();
