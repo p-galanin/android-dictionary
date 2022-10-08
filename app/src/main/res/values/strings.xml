@@ -6,6 +6,7 @@
     <string name="item_dump_to_file">Dump to file</string>
     <string name="item_restore_from_file">Restore from file</string>
     <string name="disable_notifications">Disable notifications</string>
+    <string name="toggle_show_archived">Toggle show archived words</string>
     <string name="translation_hint">Translation</string>
     <string name="word_hint">Word</string>
     <string name="save_button">Save</string>

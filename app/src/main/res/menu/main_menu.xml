@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/item_hide_archived"
+        android:title="@string/toggle_show_archived">
+    </item>
+    <item
         android:id="@+id/item_dump"
         android:title="@string/item_dump_to_file">
     </item>

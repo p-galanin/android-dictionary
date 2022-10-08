@@ -214,6 +214,8 @@ public class MainActivity extends AppCompatActivity implements WordsListView {
             this.presenter.onRestoreFromDumpClicked();
         } else if (item.getItemId() == R.id.item_stop_notify) {
             this.presenter.onDisableNotificationsClicked();
+        } else if (item.getItemId() == R.id.item_hide_archived) {
+            this.presenter.onHideArchivedClicked();
         }
         return true;
     }

@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import androidx.annotation.NonNull;
 import androidx.work.WorkManager;
@@ -30,6 +31,7 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     private WordsListView view;
     private final DictionaryRepository repository;
     private final DictionaryRepository.Navigator navigator;
+    private final DictionaryRepository.Navigator notArchivedNavigator;
     private final WorkManager workManger;
 
     private final Set<Long> invisibleTranslations = new HashSet<>();
@@ -39,11 +41,13 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
             @NonNull WordsListView view,
             @NonNull DictionaryRepository repository,
             @NonNull DictionaryRepository.Navigator navigator,
+            @Named("not archived") @NonNull DictionaryRepository.Navigator notArchivedNavigator,
             @NonNull WorkManager workManager
     ) {
         attachView(view);
         this.repository = repository;
         this.navigator = navigator;
+        this.notArchivedNavigator = notArchivedNavigator;
         this.repository.registerListener(this);
         this.workManger = workManager;
     }
@@ -68,7 +72,7 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
 
     @Override
     public int getEntriesAmount() {
-        return this.navigator.getEntriesAmount();
+        return this.getEntriesNavigator().getEntriesAmount();
     }
 
     @Override
@@ -133,6 +137,12 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
     }
 
     @Override
+    public void onHideArchivedClicked() {
+        UiSettings.setShowArchived(!UiSettings.getShowArchived());
+        this.view.refreshList();
+    }
+
+    @Override
     public void onDumpDirectoryPicked(final Uri uri) {
         final Optional<String> directoryPath = Utils.getDirectoryPathFromUri(uri);
         if (directoryPath.isPresent()) {
@@ -171,7 +181,7 @@ public class WordsListPresenterImpl implements WordsListPresenter, DictionaryRep
 
     @NonNull
     private DictionaryRepository.Navigator getEntriesNavigator() {
-        return this.navigator;
+        return UiSettings.getShowArchived() ? this.navigator : this.notArchivedNavigator;
     }
 
     @Override

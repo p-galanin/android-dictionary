@@ -18,6 +18,7 @@ public class PeriodicWorkUtils {
 
     private static final String WORD_OF_THE_DAY_WORK_NAME = "WordOfTheDay";
     private static final int NOTIFICATION_HOUR = 12;
+    private static final int NOTIFICATION_PERIOD_MINUTES = 60;
 
     static final int BLOCK_SIZE = 10;
     static final int THRESHOLD_FOR_BLOCK_SIZE = 50;
@@ -28,11 +29,9 @@ public class PeriodicWorkUtils {
      * Starts (if not started) the periodic notification with the word of the day.
      */
     public static void startWordOfTheDayNotifications(@NonNull WorkManager workManger) {
-        // final PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(
-        // WordOfTheDayPeriodicWork.class, 1, TimeUnit.HOURS) // TODO restore after debug
         final PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(
                 WordOfTheDayPeriodicWork.class,
-                15,
+                NOTIFICATION_PERIOD_MINUTES, // todo pg user settings (reschedule after change)
                 TimeUnit.MINUTES
         )
                 // .setInitialDelay(computeInitialDelay(LocalTime.now())) // TODO remove after debug

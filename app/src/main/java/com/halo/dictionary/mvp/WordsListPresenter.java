@@ -57,6 +57,8 @@ public interface WordsListPresenter extends PresenterBase<WordsListView> {
      */
     void onDisableNotificationsClicked();
 
+    void onHideArchivedClicked();
+
     /**
      * Performs restoring after dump file picked.
      *
