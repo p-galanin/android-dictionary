@@ -66,7 +66,7 @@ public class PeriodicWorkUtils {
      * @return {@code true} if it's too early or too late to bother the user, {@code false} otherwise
      */
     static boolean userMightBeSleeping(@NonNull final LocalTime currentTime) {
-        return currentTime.getHour() < 9 || currentTime.getHour() > 22;
+        return currentTime.getHour() < 8 || currentTime.getHour() > 23;
     }
 
     static OptionalInt getNextRandomIndex(final int overallAmount, final PreferencesHelper preferencesHelper) {

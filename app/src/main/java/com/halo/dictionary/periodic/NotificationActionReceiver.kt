@@ -6,9 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.halo.dictionary.mvp.WordEntry
+import com.halo.dictionary.repository.DictionaryRepository
+import com.halo.dictionary.repository.PreferencesHelper
 import com.halo.dictionary.repository.impl.sql.WordDbHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import javax.inject.Named
 
 @AndroidEntryPoint
 class NotificationActionReceiver : BroadcastReceiver() {
@@ -17,6 +20,13 @@ class NotificationActionReceiver : BroadcastReceiver() {
     lateinit var wordDbHelper: WordDbHelper
     @Inject
     lateinit var notificationManager: NotificationManager
+
+    @Inject
+    @Named("not archived")
+    lateinit var navigator: DictionaryRepository.Navigator
+
+    @Inject
+    lateinit var preferencesHelper: PreferencesHelper
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.i(TAG, "Broadcast received, extras: ${intent.extras}")
@@ -33,19 +43,24 @@ class NotificationActionReceiver : BroadcastReceiver() {
             ACTION.KNOWN -> {
                 notificationManager.cancel(notificationId)
                 updateWordWeight(wordId)
+                NotificationsSeriesChallenge.onKnown(context, navigator, preferencesHelper, notificationManager)
             }
-            ACTION.SHOW -> notificationManager.notify(
-                notificationId,
-                buildNotification(
-                    context,
-                    intent.extras?.getString(TITLE_EXTRA) ?: "?",
-                    intent.extras?.getString(TEXT_EXTRA) ?: "?",
+            ACTION.SHOW -> {
+                notificationManager.notify(
                     notificationId,
-                    listOf(Known(context, wordId), Ok(context))
+                    buildNotification(
+                        context,
+                        intent.extras?.getString(TITLE_EXTRA) ?: "?",
+                        intent.extras?.getString(TEXT_EXTRA) ?: "?",
+                        notificationId,
+                        listOf(Known(context, wordId), Ok(context))
+                    )
                 )
-            )
+                NotificationsSeriesChallenge.onShow()
+            }
             ACTION.OK -> {
                 notificationManager.cancel(notificationId)
+                NotificationsSeriesChallenge.onOk()
             }
         }
     }
